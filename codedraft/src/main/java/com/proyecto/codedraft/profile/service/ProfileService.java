@@ -1,6 +1,7 @@
 package com.proyecto.codedraft.profile.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import com.proyecto.codedraft.profile.dto.ProfileRequest;
 import com.proyecto.codedraft.profile.model.Profile;
@@ -15,16 +16,26 @@ public class ProfileService {
         this.profileRepository = profileRepository;
     }
 
-
     public Profile registerProfile(ProfileRequest request) {
-        //creo un nuevo objeto  profile con los datos del request y lo guardo en la base de datos
+        validateRequiredFields(request);
+
         Profile profile = new Profile(request.getRol(), request.getCarrera(), request.getIntereses(), 0);
         return profileRepository.save(profile);
     }
 
     public Profile getProfile() {
-        //busco el perfil en la base de datos y si no lo encuentra lanza una excepcion
         return profileRepository.findProfile()
                 .orElseThrow(() -> new ProfileNotFoundException("Aun no se ha registrado un perfil de usuario"));
+    }
+
+    private void validateRequiredFields(ProfileRequest request) {
+        if (request == null
+                || !StringUtils.hasText(request.getRol())
+                || !StringUtils.hasText(request.getCarrera())
+                || request.getIntereses() == null
+                || request.getIntereses().isEmpty()
+                || request.getIntereses().stream().anyMatch(interest -> !StringUtils.hasText(interest))) {
+            throw new IllegalArgumentException("Por favor registra rol, carrera e intereses para continuar.");
+        }
     }
 }
