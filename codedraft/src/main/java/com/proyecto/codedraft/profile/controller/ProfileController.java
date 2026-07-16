@@ -21,8 +21,10 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/profile")
 public class ProfileController {
 
+    //service para llamar funciones 
     private final ProfileService profileService;
 
+//constructor para inyectar el servicio
     public ProfileController(ProfileService profileService) {
         this.profileService = profileService;
     }
@@ -33,6 +35,7 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ProfileResponse.fromModel(profile));
     }
 
+// Este se encarga de la busqueda del perfil, si no lo encuentra lanza una excepcion que es manejada por el metodo handleProfileNotFound
     @GetMapping
     public ResponseEntity<ProfileResponse> getProfile() {
         Profile profile = profileService.getProfile();
