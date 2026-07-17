@@ -250,3 +250,10 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 ---
 ## 5 Tareas completadas 
 HU-001 → HU-004 → HU-005 → HU-010 → HU-006
+
+
+----
+## 6 Logica de Recomendacion de cursos  CATALOG.JSON 
+
+** Guiate del archivo md Logica_recomendacion_cursos_CodeCraftHub.md
+

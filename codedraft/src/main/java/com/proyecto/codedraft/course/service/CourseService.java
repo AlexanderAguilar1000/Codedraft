@@ -47,9 +47,9 @@ public class CourseService {
                 status, priority, targetDate, progress);
 
         List<Course> courses = courseRepository.findAll();
-        courses.add(course);
-        courseRepository.saveAll(courses);
-        return course;
+        courses.add(course);//lo agrega a la lista de cursos 
+        courseRepository.saveAll(courses);// lo guarda en la base de datos 
+        return course;//devuelve el curso que creo 
     }
 
     public List<Course> listCourses() {
@@ -58,9 +58,9 @@ public class CourseService {
 
     public Course updateStatus(String id, String rawStatus) {
         CourseStatus status = parseStatus(rawStatus);
-        List<Course> courses = courseRepository.findAll();
-        Course course = findByIdOrThrow(courses, id);
-        course.setStatus(status);
+        List<Course> courses = courseRepository.findAll();//lista de cursos 
+        Course course = findByIdOrThrow(courses, id);//encontramos el curso por id 
+        course.setStatus(status);//cambiamos el estado del curso 
         courseRepository.saveAll(courses);
         return course;
     }
@@ -74,6 +74,7 @@ public class CourseService {
         return course;
     }
 
+   //si se encontro el curso perfecto si no lanza una excepcion
     private Course findByIdOrThrow(List<Course> courses, String id) {
         return courses.stream()
                 .filter(course -> course.getId().equals(id))
