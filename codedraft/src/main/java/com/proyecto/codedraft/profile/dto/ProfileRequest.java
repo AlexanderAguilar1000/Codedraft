@@ -4,17 +4,20 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 
 public class ProfileRequest {
 
     @NotBlank(message = "El rol es obligatorio")
+    @Pattern(regexp = "^[^0-9]*$", message = "El rol no debe contener números")
     private String rol;
 
     @NotBlank(message = "La carrera es obligatoria")
+    @Pattern(regexp = "^[^0-9]*$", message = "La carrera no debe contener números")
     private String carrera;
 
     @NotEmpty(message = "Debe indicar al menos un interes")
-    private List<@NotBlank(message = "El interes no puede estar vacio") String> intereses;
+    private List<@NotBlank(message = "El interes no puede estar vacio") @Pattern(regexp = "^[^0-9]*$", message = "El interes no debe contener números") String> intereses;
 
     public ProfileRequest() {
     }

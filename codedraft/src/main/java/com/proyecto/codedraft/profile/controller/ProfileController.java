@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.proyecto.codedraft.profile.dto.ProfileRequest;
 import com.proyecto.codedraft.profile.dto.ProfileResponse;
 import com.proyecto.codedraft.profile.model.Profile;
@@ -33,7 +35,7 @@ public class ProfileController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ProfileResponse> registerProfile(@RequestBody ProfileRequest request) {
+    public ResponseEntity<ProfileResponse> registerProfile(@Valid @RequestBody ProfileRequest request) {
         Profile profile = profileService.registerProfile(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ProfileResponse.fromModel(profile));
     }

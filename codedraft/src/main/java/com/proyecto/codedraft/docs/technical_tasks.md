@@ -245,3 +245,8 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 - **Total de tareas técnicas:** 39 (TT-001 a TT-039), a nivel de funcionalidad (endpoint o componente de interfaz completo).
 - **Orden de construcción:** HU-001 → HU-004 → HU-005 → HU-010 → HU-006 → HU-007 → HU-008 → HU-009 → HU-011 → HU-002/HU-003 → HU-012 → HU-013 → HU-014 → HU-015.
 - **Sin base de datos:** toda la persistencia se resuelve leyendo/escribiendo `profile.json`, `courses.json` y `catalog.json` con Jackson desde el backend de Spring Boot.
+
+
+---
+## 5 Tareas completadas 
+HU-001 → HU-004 → HU-005 → HU-010 → HU-006
