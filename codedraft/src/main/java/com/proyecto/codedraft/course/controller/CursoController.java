@@ -3,11 +3,13 @@ package com.proyecto.codedraft.course.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 import com.proyecto.codedraft.course.dto.CoursePriorityUpdateRequest;
+import com.proyecto.codedraft.course.dto.CourseRecommendationResponse;
 import com.proyecto.codedraft.course.dto.CourseRequest;
 import com.proyecto.codedraft.course.dto.CourseResponse;
 import com.proyecto.codedraft.course.dto.CourseStatusUpdateRequest;
 import com.proyecto.codedraft.course.dto.ProgressUpdateRequest;
+import com.proyecto.codedraft.course.dto.TargetDateUpdateRequest;
 import com.proyecto.codedraft.course.model.Course;
 import com.proyecto.codedraft.course.service.CourseNotFoundException;
 import com.proyecto.codedraft.course.service.CourseService;
@@ -78,6 +82,31 @@ public class CursoController {
                                                           @Valid @RequestBody ProgressUpdateRequest request) {
         Course course = courseService.updateProgress(id, request.getProgress());
         return ResponseEntity.ok(CourseResponse.fromModel(course));
+    }
+
+    //actualiza la fecha objetivo del curso
+    @PatchMapping("/{id}/target-date")
+    public ResponseEntity<CourseResponse> updateTargetDate(@PathVariable String id,
+                                                             @Valid @RequestBody TargetDateUpdateRequest request) {
+        Course course = courseService.updateTargetDate(id, request.getTargetDate());
+        return ResponseEntity.ok(CourseResponse.fromModel(course));
+    }
+
+    //elimina un curso
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
+        courseService.deleteCourse(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    //obtiene el siguiente curso recomendado a estudiar
+    @GetMapping("/recommendation")
+    public ResponseEntity<CourseRecommendationResponse> getRecommendation() {
+        Optional<Course> recommended = courseService.getRecommendation();
+        CourseRecommendationResponse response = recommended
+                .map(course -> CourseRecommendationResponse.of(CourseResponse.fromModel(course)))
+                .orElseGet(() -> CourseRecommendationResponse.empty("No hay cursos pendientes"));
+        return ResponseEntity.ok(response);
     }
 
 

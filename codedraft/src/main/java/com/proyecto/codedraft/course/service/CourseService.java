@@ -2,7 +2,9 @@ package com.proyecto.codedraft.course.service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -90,6 +92,54 @@ public class CourseService {
         course.setProgress(progress);
         courseRepository.saveAll(courses);
         return course;
+    }
+
+    //actualiza la fecha objetivo del curso
+    public Course updateTargetDate(String id, LocalDate targetDate) {
+        if (targetDate == null) {
+            throw new IllegalArgumentException("La fecha objetivo es obligatoria");
+        }
+        List<Course> courses = courseRepository.findAll();
+        Course course = findByIdOrThrow(courses, id);
+        course.setTargetDate(targetDate);
+        courseRepository.saveAll(courses);
+        return course;
+    }
+
+    //elimina un curso por id
+    public void deleteCourse(String id) {
+        List<Course> courses = courseRepository.findAll();
+        Course course = findByIdOrThrow(courses, id);
+        courses.remove(course);
+        courseRepository.saveAll(courses);
+    }
+
+    //obtiene el siguiente curso recomendado: cursos pendientes ordenados por
+    //prioridad (alta primero), estado (en curso antes que no iniciado) y fecha objetivo (mas cercana primero)
+    public Optional<Course> getRecommendation() {
+        return courseRepository.findAll().stream()
+                .filter(course -> course.getStatus() != CourseStatus.COMPLETADO)
+                .sorted(Comparator
+                        .comparingInt((Course course) -> priorityWeight(course.getPriority()))
+                        .thenComparingInt(course -> statusWeight(course.getStatus()))
+                        .thenComparing(Course::getTargetDate, Comparator.nullsLast(Comparator.naturalOrder())))
+                .findFirst();
+    }
+
+    private int priorityWeight(CoursePriority priority) {
+        return switch (priority) {
+            case ALTA -> 0;
+            case MEDIA -> 1;
+            case BAJA -> 2;
+        };
+    }
+
+    private int statusWeight(CourseStatus status) {
+        return switch (status) {
+            case EN_CURSO -> 0;
+            case NO_INICIADO -> 1;
+            case COMPLETADO -> 2;
+        };
     }
 
    //si se encontro el curso perfecto si no lanza una excepcion
