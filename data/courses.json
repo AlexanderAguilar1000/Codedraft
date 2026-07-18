@@ -1,0 +1,9 @@
+[ {
+  "id" : "af2c8487-b684-4f29-bb2d-42f90f431331",
+  "name" : "Spring Boot",
+  "description" : "Curso para aprender Spring Boot",
+  "status" : "NO_INICIADO",
+  "priority" : "ALTA",
+  "targetDate" : "2026-12-31",
+  "progress" : 0
+} ]

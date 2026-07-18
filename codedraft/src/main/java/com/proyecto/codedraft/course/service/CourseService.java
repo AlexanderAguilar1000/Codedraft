@@ -30,26 +30,32 @@ public class CourseService {
             throw new IllegalArgumentException("El nombre del curso es obligatorio");
         }
 
+        // Validar que no exista un curso con el mismo nombre
+        List<Course> existingCourses = courseRepository.findAll();
+        boolean nameExists = existingCourses.stream()
+                .anyMatch(course -> course.getName().equalsIgnoreCase(request.getName()));
+        if (nameExists) {
+            throw new IllegalArgumentException("Ya existe un curso con el nombre: " + request.getName());
+        }
 
-        
         CourseStatus status = StringUtils.hasText(request.getStatus())
-                ? parseStatus(request.getStatus())//obtener el estado 
+                ? parseStatus(request.getStatus())//obtener el estado
                 : CourseStatus.NO_INICIADO;
         CoursePriority priority = StringUtils.hasText(request.getPriority())
-                ? parsePriority(request.getPriority()) //obtener la prioridad 
+                ? parsePriority(request.getPriority()) //obtener la prioridad
                 : CoursePriority.MEDIA;
-        LocalDate targetDate = StringUtils.hasText(request.getTargetDate())
-                ? parseTargetDate(request.getTargetDate()) //obtener la fecha objetivo 
-                : null;
+        LocalDate targetDate = request.getTargetDate(); // Ya viene validado como LocalDate desde el DTO
         int progress = request.getProgress() != null ? request.getProgress() : 0;
+
+        // Validar consistencia entre status y progress
+        validateStatusProgressConsistency(status, progress);
 
         Course course = new Course(UUID.randomUUID().toString(), request.getName(), request.getDescription(),
                 status, priority, targetDate, progress);
 
-        List<Course> courses = courseRepository.findAll();
-        courses.add(course);//lo agrega a la lista de cursos 
-        courseRepository.saveAll(courses);// lo guarda en la base de datos 
-        return course;//devuelve el curso que creo 
+        existingCourses.add(course);//lo agrega a la lista de cursos
+        courseRepository.saveAll(existingCourses);// lo guarda en la base de datos
+        return course;//devuelve el curso que creo
     }
 
     public List<Course> listCourses() {
@@ -70,6 +76,18 @@ public class CourseService {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
         course.setPriority(priority);
+        courseRepository.saveAll(courses);
+        return course;
+    }
+
+    public Course updateProgress(String id, int progress) {
+        List<Course> courses = courseRepository.findAll();
+        Course course = findByIdOrThrow(courses, id);
+        
+        // Validar consistencia entre status y progress
+        validateStatusProgressConsistency(course.getStatus(), progress);
+        
+        course.setProgress(progress);
         courseRepository.saveAll(courses);
         return course;
     }
@@ -104,6 +122,35 @@ public class CourseService {
             return LocalDate.parse(rawTargetDate.trim());
         } catch (DateTimeParseException ex) {
             throw new IllegalArgumentException("La fecha objetivo debe tener el formato yyyy-MM-dd");
+        }
+    }
+
+    /**
+     * Valida la consistencia entre el estado del curso y su progreso.
+     * - Si el curso está COMPLETADO, el progreso debe ser 100
+     * - Si el curso está NO_INICIADO, el progreso debe ser 0
+     * - Si el curso está EN_CURSO, el progreso debe estar entre 1 y 99
+     */
+    private void validateStatusProgressConsistency(CourseStatus status, int progress) {
+        switch (status) {
+            case COMPLETADO:
+                if (progress != 100) {
+                    throw new IllegalArgumentException(
+                            "Un curso completado debe tener un progreso del 100%");
+                }
+                break;
+            case NO_INICIADO:
+                if (progress != 0) {
+                    throw new IllegalArgumentException(
+                            "Un curso no iniciado debe tener un progreso del 0%");
+                }
+                break;
+            case EN_CURSO:
+                if (progress < 1 || progress > 99) {
+                    throw new IllegalArgumentException(
+                            "Un curso en curso debe tener un progreso entre 1% y 99%");
+                }
+                break;
         }
     }
 }

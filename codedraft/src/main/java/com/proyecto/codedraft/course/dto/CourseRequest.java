@@ -1,8 +1,8 @@
 package com.proyecto.codedraft.course.dto;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
+
+import jakarta.validation.constraints.*;
 
 public class CourseRequest {
 
@@ -15,7 +15,9 @@ public class CourseRequest {
 
     private String priority;
 
-    private String targetDate;
+    @NotNull(message = "La fecha objetivo es obligatoria")
+    @Future(message = "La fecha objetivo debe ser una fecha futura")
+    private LocalDate targetDate;
 
     @Min(value = 0, message = "El progreso debe estar entre 0 y 100")
     @Max(value = 100, message = "El progreso debe estar entre 0 y 100")
@@ -56,11 +58,11 @@ public class CourseRequest {
         this.priority = priority;
     }
 
-    public String getTargetDate() {
+    public LocalDate getTargetDate() {
         return targetDate;
     }
 
-    public void setTargetDate(String targetDate) {
+    public void setTargetDate(LocalDate targetDate) {
         this.targetDate = targetDate;
     }
 

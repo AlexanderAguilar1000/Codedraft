@@ -23,6 +23,7 @@ import com.proyecto.codedraft.course.dto.CoursePriorityUpdateRequest;
 import com.proyecto.codedraft.course.dto.CourseRequest;
 import com.proyecto.codedraft.course.dto.CourseResponse;
 import com.proyecto.codedraft.course.dto.CourseStatusUpdateRequest;
+import com.proyecto.codedraft.course.dto.ProgressUpdateRequest;
 import com.proyecto.codedraft.course.model.Course;
 import com.proyecto.codedraft.course.service.CourseNotFoundException;
 import com.proyecto.codedraft.course.service.CourseService;
@@ -68,6 +69,14 @@ public class CursoController {
     public ResponseEntity<CourseResponse> updatePriority(@PathVariable String id,
                                                            @Valid @RequestBody CoursePriorityUpdateRequest request) {
         Course course = courseService.updatePriority(id, request.getPriority());
+        return ResponseEntity.ok(CourseResponse.fromModel(course));
+    }
+
+    //actualiza el progreso del curso
+    @PatchMapping("/{id}/progress")
+    public ResponseEntity<CourseResponse> updateProgress(@PathVariable String id,
+                                                          @Valid @RequestBody ProgressUpdateRequest request) {
+        Course course = courseService.updateProgress(id, request.getProgress());
         return ResponseEntity.ok(CourseResponse.fromModel(course));
     }
 
