@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -15,14 +16,21 @@ import com.proyecto.codedraft.course.model.Course;
 import com.proyecto.codedraft.course.model.CoursePriority;
 import com.proyecto.codedraft.course.model.CourseStatus;
 import com.proyecto.codedraft.course.repositorio.CourseRepository;
+import com.proyecto.codedraft.profile.service.ProfileService;
 
 @Service
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final ProfileService profileService;
+    private final int experiencePointsPerProgressUpdate;
 
-    public CourseService(CourseRepository courseRepository) {
+    public CourseService(CourseRepository courseRepository,
+                          ProfileService profileService,
+                          @Value("${app.experience.points-per-progress-update:5}") int experiencePointsPerProgressUpdate) {
         this.courseRepository = courseRepository;
+        this.profileService = profileService;
+        this.experiencePointsPerProgressUpdate = experiencePointsPerProgressUpdate;
     }
 
     public Course registerCourse(CourseRequest request) {
@@ -85,12 +93,16 @@ public class CourseService {
     public Course updateProgress(String id, int progress) {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
-        
+
         // Validar consistencia entre status y progress
         validateStatusProgressConsistency(course.getStatus(), progress);
-        
+
         course.setProgress(progress);
         courseRepository.saveAll(courses);
+
+        // Cada actualización exitosa de progreso otorga puntos de experiencia al perfil
+        profileService.addExperiencePoints(experiencePointsPerProgressUpdate);
+
         return course;
     }
 

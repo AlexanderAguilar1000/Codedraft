@@ -28,6 +28,16 @@ public class ProfileService {
                 .orElseThrow(() -> new ProfileNotFoundException("Aun no se ha registrado un perfil de usuario"));
     }
 
+    //suma puntos de experiencia al perfil del usuario y persiste el cambio
+    public Profile addExperiencePoints(int points) {
+        if (points < 0) {
+            throw new IllegalArgumentException("Los puntos de experiencia a sumar no pueden ser negativos");
+        }
+        Profile profile = getProfile();
+        profile.setExperiencePoints(profile.getExperiencePoints() + points);
+        return profileRepository.save(profile);
+    }
+
     private void validateRequiredFields(ProfileRequest request) {
         if (request == null
                 || !StringUtils.hasText(request.getRol())

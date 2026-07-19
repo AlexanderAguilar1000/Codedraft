@@ -46,9 +46,13 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
   "id": "string",
   "name": "string",
   "description": "string",
+  "roles": ["string"],
+  "careers": ["string"],
   "tags": ["string"]
 }
 ```
+
+> Cada curso puede asociarse a uno o varios roles profesionales (`roles`), carreras (`careers`) y etiquetas tecnológicas (`tags`). Estos campos se utilizan en el algoritmo de puntuación para las recomendaciones personalizadas (ver sección HU-002/HU-003 y [Logica_recomendacion_cursos_CodeCraftHub.md](./Logica_recomendacion_cursos_CodeCraftHub.md)).
 
 ### Estructuras del servicio de IA (no persistidas, solo request/response)
 
@@ -191,11 +195,21 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 
 ### HU-002 Recomendaciones personalizadas + HU-003 Cursos sugeridos
 
+> **Lógica de recomendación:** Se aplica un algoritmo de puntuación basado en el perfil del usuario (ver [Logica_recomendacion_cursos_CodeCraftHub.md](./Logica_recomendacion_cursos_CodeCraftHub.md)).
+>
+> | Criterio | Puntos |
+> |----------|--------|
+> | Coincidencia de **rol** (`profile.rol` ∈ `catalog.roles`) | **+3** |
+> | Coincidencia de **carrera** (`profile.carrera` ∈ `catalog.careers`) | **+1** |
+> | Cada **interés** coincidente (`profile.intereses` ∩ `catalog.tags`) | **+2** por cada uno |
+>
+> Los cursos se ordenan de **mayor a menor puntaje**. Si ningún curso obtiene puntaje, se retorna el catálogo completo ordenado alfabéticamente.
+
 | ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
 |----|-------|------|-----------|---------------|---------------------------|
-| TT-024 | Crear el catálogo estático de cursos sugeridos (`catalog.json` con tags) | BE | Media | — | `catalog.json` contiene al menos 10 cursos con tags de interés. |
-| TT-025 | Desarrollar endpoint de cursos sugeridos (`GET /api/courses/suggested`) | BE | Alta | TT-002, TT-024 | Filtra `catalog.json` según los intereses del perfil; retorna una lista general si no hay coincidencias. |
-| TT-026 | Construir la vista de cursos sugeridos | FE | Alta | — | Muestra tarjetas con los cursos sugeridos tras completar el perfil. |
+| TT-024 | Crear el catálogo estático de cursos sugeridos (`catalog.json` con `roles`, `careers` y `tags`) | BE | Media | — | `catalog.json` contiene al menos 10 cursos; cada curso incluye los campos `roles`, `careers` y `tags`. |
+| TT-025 | Desarrollar endpoint de cursos sugeridos con algoritmo de puntuación (`GET /api/courses/suggested`) | BE | Alta | TT-002, TT-024 | Calcula el puntaje de cada curso del catálogo según rol (+3), carrera (+1) e intereses (+2 cada uno) del perfil; retorna la lista ordenada de mayor a menor puntaje incluyendo el score; si ningún curso puntúa, retorna el catálogo completo ordenado alfabéticamente. |
+| TT-026 | Construir la vista de cursos sugeridos | FE | Alta | — | Muestra tarjetas con los cursos sugeridos tras completar el perfil; cada tarjeta puede mostrar el puntaje de relevancia. |
 | TT-027 | Conectar la vista de sugeridos con el endpoint | FE | Alta | TT-025, TT-026 | La lista se carga automáticamente al finalizar el registro del perfil. |
 
 ---
@@ -249,11 +263,22 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 
 ---
 ## 5 Tareas completadas 
-HU-001 → HU-004 → HU-005 → HU-010 → HU-006
+HU-001 → HU-004 → HU-005 → HU-010 → HU-006 -> HU-007 Actualizar la fecha objetivo de un curso , HU-008 Actualizar el progreso de un curso , H09 Eliminar un curso 
+Hu-011 , HU-002 Recomendaciones personalizadas + HU-003 Cursos sugeridos ,  HU-015
+
+Las demas historias de usuario faltan es para la IA 
 
 
 ----
-## 6 Logica de Recomendacion de cursos  CATALOG.JSON 
+## 6 Lógica de Recomendación de cursos — CATALOG.JSON 
 
-** Guiate del archivo md Logica_recomendacion_cursos_CodeCraftHub.md
+Se implementa un **algoritmo de puntuación** basado en el perfil del usuario, según lo descrito en [Logica_recomendacion_cursos_CodeCraftHub.md](./Logica_recomendacion_cursos_CodeCraftHub.md).
+
+| Criterio | Puntos | Comparación |
+|----------|--------|-------------|
+| Rol coincide | +3 | `profile.rol` ∈ `catalog[i].roles` |
+| Carrera coincide | +1 | `profile.carrera` ∈ `catalog[i].careers` |
+| Cada interés coincidente | +2 | `profile.intereses` ∩ `catalog[i].tags` |
+
+**Fallback:** si ningún curso obtiene puntaje > 0, se retorna el catálogo completo ordenado alfabéticamente.
 

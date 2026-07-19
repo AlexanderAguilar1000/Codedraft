@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
+import com.proyecto.codedraft.profile.dto.ExperiencePointsResponse;
 import com.proyecto.codedraft.profile.dto.ProfileRequest;
 import com.proyecto.codedraft.profile.dto.ProfileResponse;
 import com.proyecto.codedraft.profile.model.Profile;
@@ -45,6 +46,13 @@ public class ProfileController {
     public ResponseEntity<ProfileResponse> getProfile() {
         Profile profile = profileService.getProfile();
         return ResponseEntity.ok(ProfileResponse.fromModel(profile));
+    }
+
+    //consulta los puntos de experiencia acumulados por el usuario
+    @GetMapping("/points")
+    public ResponseEntity<ExperiencePointsResponse> getExperiencePoints() {
+        Profile profile = profileService.getProfile();
+        return ResponseEntity.ok(ExperiencePointsResponse.fromModel(profile));
     }
 
     @ExceptionHandler(ProfileNotFoundException.class)

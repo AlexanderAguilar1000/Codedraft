@@ -27,8 +27,10 @@ import com.proyecto.codedraft.course.dto.CourseRequest;
 import com.proyecto.codedraft.course.dto.CourseResponse;
 import com.proyecto.codedraft.course.dto.CourseStatusUpdateRequest;
 import com.proyecto.codedraft.course.dto.ProgressUpdateRequest;
+import com.proyecto.codedraft.course.dto.SuggestedCourseResponse;
 import com.proyecto.codedraft.course.dto.TargetDateUpdateRequest;
 import com.proyecto.codedraft.course.model.Course;
+import com.proyecto.codedraft.course.service.CatalogService;
 import com.proyecto.codedraft.course.service.CourseNotFoundException;
 import com.proyecto.codedraft.course.service.CourseService;
 
@@ -37,9 +39,11 @@ import com.proyecto.codedraft.course.service.CourseService;
 public class CursoController {
 
     private final CourseService courseService;
+    private final CatalogService catalogService;
 
-    public CursoController(CourseService courseService) {
+    public CursoController(CourseService courseService, CatalogService catalogService) {
         this.courseService = courseService;
+        this.catalogService = catalogService;
     }
 
 
@@ -109,9 +113,23 @@ public class CursoController {
         return ResponseEntity.ok(response);
     }
 
+    //obtiene los cursos sugeridos del catálogo según el perfil del usuario
+    //utiliza el algoritmo de puntuación: rol (+3), carrera (+1), interés (+2 cada uno)
+    @GetMapping("/suggested")
+    public ResponseEntity<List<SuggestedCourseResponse>> getSuggestedCourses() {
+        List<SuggestedCourseResponse> suggested = catalogService.getSuggestedCourses();
+        return ResponseEntity.ok(suggested);
+    }
+
 
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleCourseNotFound(CourseNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(com.proyecto.codedraft.profile.service.ProfileNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleProfileNotFound(
+            com.proyecto.codedraft.profile.service.ProfileNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
     }
 
