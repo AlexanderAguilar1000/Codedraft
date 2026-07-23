@@ -39,11 +39,11 @@ import com.proyecto.codedraft.course.service.CourseService;
 public class CursoController {
 
     private final CourseService courseService;
-    private final CatalogService catalogService;
+  
 
-    public CursoController(CourseService courseService, CatalogService catalogService) {
+    public CursoController(CourseService courseService) {
         this.courseService = courseService;
-        this.catalogService = catalogService;
+    
     }
 
 
@@ -73,6 +73,13 @@ public class CursoController {
                 .map(CourseResponse::fromModel)
                 .toList();
         return ResponseEntity.ok(response);
+    }
+
+    //obtiene el detalle de un curso por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<CourseResponse> getCourseById(@PathVariable String id) {
+        Course course = courseService.getCourseById(id);
+        return ResponseEntity.ok(CourseResponse.fromModel(course));
     }
 
     //actualiza el estado del curso 
@@ -127,15 +134,7 @@ public class CursoController {
         return ResponseEntity.ok(response);
     }
 
-    //obtiene los cursos sugeridos del catálogo según el perfil del usuario
-    //utiliza el algoritmo de puntuación: rol (+3), carrera (+1), interés (+2 cada uno)
-    //AQUI  RECOMIENDA CURSOS AL USUARIO EN BASE A SU PERFIL E INTERESE 
-    @GetMapping("/suggested") //ultimo    
-    public ResponseEntity<List<SuggestedCourseResponse>> getSuggestedCourses() {
-        List<SuggestedCourseResponse> suggested = catalogService.getSuggestedCourses();
-        return ResponseEntity.ok(suggested);
-    }
-
+    
 
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleCourseNotFound(CourseNotFoundException ex) {

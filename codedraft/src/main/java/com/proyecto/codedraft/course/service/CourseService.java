@@ -72,6 +72,17 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public Course getCourseById(String id) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID del curso es obligatorio");
+        }
+        List<Course> courses = courseRepository.findAll();
+        if (courses == null) {
+            throw new IllegalStateException("Error al obtener la lista de cursos");
+        }
+        return findByIdOrThrow(courses, id);
+    }
+
     public Course updateStatus(String id, String rawStatus) {
         CourseStatus status = parseStatus(rawStatus);
         List<Course> courses = courseRepository.findAll();//lista de cursos 
