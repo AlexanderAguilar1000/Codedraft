@@ -43,11 +43,22 @@ public class CatalogService {
      * el puntaje de relevancia calculado a partir del perfil del usuario.
      */
     public List<SuggestedCourseResponse> getSuggestedCourses() {
-        Profile profile = profileService.getProfile();
+        Profile profile;
+        try {
+            profile = profileService.getProfile();
+        } catch (Exception e) {
+            throw new IllegalStateException("Error al obtener el perfil del usuario: " + e.getMessage(), e);
+        }
+
         List<CatalogCourse> catalog = catalogRepository.findAll();
+
+        if (catalog == null) {
+            throw new IllegalStateException("Error al obtener el catálogo de cursos");
+        }
 
         // Calcular puntaje para cada curso
         List<SuggestedCourseResponse> scored = catalog.stream()
+                .filter(course -> course != null && course.getName() != null)
                 .map(course -> SuggestedCourseResponse.fromCatalogCourse(course, calculateScore(course, profile)))
                 .toList();
 

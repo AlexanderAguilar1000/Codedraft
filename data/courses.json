@@ -1,9 +1,17 @@
 [ {
-  "id" : "af2c8487-b684-4f29-bb2d-42f90f431331",
-  "name" : "Spring Boot",
-  "description" : "Curso para aprender Spring Boot",
+  "id" : "7d3e7ff2-f087-4a2f-8e91-e49f560cc5d2",
+  "name" : "Java Avanzado",
+  "description" : "Curso avanzado de Java",
   "status" : "NO_INICIADO",
   "priority" : "ALTA",
-  "targetDate" : "2026-12-31",
+  "targetDate" : "2027-03-31",
+  "progress" : 0
+}, {
+  "id" : "02271bd1-d9ca-485a-8241-77bc38814fcc",
+  "name" : "Angular y Docker",
+  "description" : "Curso para aprender desarrollo frontend con Angular y despliegue de aplicaciones usando Docker",
+  "status" : "NO_INICIADO",
+  "priority" : "ALTA",
+  "targetDate" : "2027-06-30",
   "progress" : 0
 } ]

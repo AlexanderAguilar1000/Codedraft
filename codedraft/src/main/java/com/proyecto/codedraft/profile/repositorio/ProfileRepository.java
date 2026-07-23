@@ -16,12 +16,15 @@ public class ProfileRepository {
     private final File profileFile;
     private final Object lock = new Object();
 
+    //un nuevo archivo json 
     public ProfileRepository(ObjectMapper objectMapper,
                               @Value("${app.data.profile-file:data/profile.json}") String profileFilePath) {
         this.objectMapper = objectMapper;
         this.profileFile = new File(profileFilePath);
     }
 
+
+    ///busca un archivo json que contenga el perfil del usuario, si no lo encuentra retorna un optional vacio
     public Optional<Profile> findProfile() {
         synchronized (lock) {
             if (!profileFile.exists()) {
@@ -31,6 +34,7 @@ public class ProfileRepository {
         }
     }
 
+//guarda en uno solo archivo json el perfil del usuario, si no existe lo crea, si existe lo sobreescribe
     public Profile save(Profile profile) {
         synchronized (lock) {
             File parentDir = profileFile.getParentFile();

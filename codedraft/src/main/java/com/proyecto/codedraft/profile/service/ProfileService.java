@@ -23,6 +23,8 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
+
+    //Si quiero modificar el perfil para varios usuarios debo cambia esto 
     public Profile getProfile() {
         return profileRepository.findProfile()
                 .orElseThrow(() -> new ProfileNotFoundException("Aun no se ha registrado un perfil de usuario"));
@@ -38,6 +40,9 @@ public class ProfileService {
         return profileRepository.save(profile);
     }
 
+
+
+    //valida que no envie  valores vacios 
     private void validateRequiredFields(ProfileRequest request) {
         if (request == null
                 || !StringUtils.hasText(request.getRol())

@@ -76,20 +76,22 @@ public class CourseService {
         CourseStatus status = parseStatus(rawStatus);
         List<Course> courses = courseRepository.findAll();//lista de cursos 
         Course course = findByIdOrThrow(courses, id);//encontramos el curso por id 
-        course.setStatus(status);//cambiamos el estado del curso 
+        course.setStatus(status);//cambiamos el estado del curso  (NO iniciado , en curso y completado
         courseRepository.saveAll(courses);
         return course;
     }
 
     public Course updatePriority(String id, String rawPriority) {
-        CoursePriority priority = parsePriority(rawPriority);
-        List<Course> courses = courseRepository.findAll();
-        Course course = findByIdOrThrow(courses, id);
-        course.setPriority(priority);
-        courseRepository.saveAll(courses);
+        CoursePriority priority = parsePriority(rawPriority);//prioridad alta, media y baja 
+        List<Course> courses = courseRepository.findAll();//obtiene todos los cursos 
+        Course course = findByIdOrThrow(courses, id);//encuentra el curso por id 
+        course.setPriority(priority);//cambia la prioridad del curso  (alta , media y baja)
+        courseRepository.saveAll(courses);//guarda todos los cursos 
         return course;
     }
 
+
+    //a este metodo se debe llamar para que  que se aumente punto en el perfil del usuario 
     public Course updateProgress(String id, int progress) {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
@@ -122,8 +124,8 @@ public class CourseService {
     public void deleteCourse(String id) {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
-        courses.remove(course);
-        courseRepository.saveAll(courses);
+        courses.remove(course);//lo saca de la lista
+        courseRepository.saveAll(courses);// lo guarda 
     }
 
     //obtiene el siguiente curso recomendado: cursos pendientes ordenados por
@@ -131,12 +133,21 @@ public class CourseService {
     public Optional<Course> getRecommendation() {
         return courseRepository.findAll().stream()
                 .filter(course -> course.getStatus() != CourseStatus.COMPLETADO)
+                .filter(course -> course.getTargetDate() == null || !course.getTargetDate().isBefore(LocalDate.now()))
+                .filter(course -> {
+                    try {
+                        validateStatusProgressConsistency(course.getStatus(), course.getProgress());
+                        return true;
+                    } catch (IllegalArgumentException e) {
+                        return false;
+                    }
+                })
                 .sorted(Comparator
                         .comparingInt((Course course) -> priorityWeight(course.getPriority()))
                         .thenComparingInt(course -> statusWeight(course.getStatus()))
                         .thenComparing(Course::getTargetDate, Comparator.nullsLast(Comparator.naturalOrder())))
-                .findFirst();
-    }
+                .findFirst(); //prioriza la fecha mas cercana 
+    } //ordenar de menor a mayor el numero menor que salga ese,  cera el curso prioritario 
 
     private int priorityWeight(CoursePriority priority) {
         return switch (priority) {
@@ -162,6 +173,7 @@ public class CourseService {
                 .orElseThrow(() -> new CourseNotFoundException("No se encontro un curso con id " + id));
     }
 
+   //VALIDACIONES para que se ingrese solo esos datos 
     private CourseStatus parseStatus(String rawStatus) {
         try {
             return CourseStatus.valueOf(rawStatus.trim().toUpperCase());

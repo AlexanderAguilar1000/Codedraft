@@ -52,19 +52,33 @@ public class CursoController {
     public ResponseEntity<CourseResponse> registerCourse(@Valid @RequestBody CourseRequest request) {
         //recibe  un curso  y lo guarda 
         Course course = courseService.registerCourse(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CourseResponse.fromModel(course));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CourseResponse.fromModel(course)); // esto devuelve el codigo de estado 201  , el json que devuelve el servicio
     }
 
     //muestra la lista de cursos 
     @GetMapping
-    public ResponseEntity<List<CourseResponse>> listCourses() {
-        List<CourseResponse> response = courseService.listCourses().stream()
+    public ResponseEntity<?> listCourses() {
+        List<Course> courses = courseService.listCourses();
+        
+        if (courses == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Error al obtener la lista de cursos"));
+        }
+        
+        if (courses.isEmpty()) {
+            return ResponseEntity.ok(Map.of("message", "No hay cursos registrados"));
+        }
+        
+        List<CourseResponse> response = courses.stream()
                 .map(CourseResponse::fromModel)
                 .toList();
         return ResponseEntity.ok(response);
     }
 
     //actualiza el estado del curso 
+    // NO_INICIADO,
+    //EN_CURSO,
+    //COMPLETADO
     @PatchMapping("/{id}/status")
     public ResponseEntity<CourseResponse> updateStatus(@PathVariable String id,
                                                          @Valid @RequestBody CourseStatusUpdateRequest request) {
@@ -72,7 +86,7 @@ public class CursoController {
         return ResponseEntity.ok(CourseResponse.fromModel(course));
     }
 
-    //actualiza la prioridad del curso 
+    //actualiza la prioridad del curso  (ALTA , MEDIA  Y BAJA )
     @PatchMapping("/{id}/priority")
     public ResponseEntity<CourseResponse> updatePriority(@PathVariable String id,
                                                            @Valid @RequestBody CoursePriorityUpdateRequest request) {
@@ -96,14 +110,14 @@ public class CursoController {
         return ResponseEntity.ok(CourseResponse.fromModel(course));
     }
 
-    //elimina un curso
+    //elimina un curso  aqui
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable String id) {
         courseService.deleteCourse(id);
         return ResponseEntity.noContent().build();
     }
 
-    //obtiene el siguiente curso recomendado a estudiar
+    //obtiene el siguiente curso recomendado a estudiar (AQUI )
     @GetMapping("/recommendation")
     public ResponseEntity<CourseRecommendationResponse> getRecommendation() {
         Optional<Course> recommended = courseService.getRecommendation();
@@ -115,7 +129,8 @@ public class CursoController {
 
     //obtiene los cursos sugeridos del catálogo según el perfil del usuario
     //utiliza el algoritmo de puntuación: rol (+3), carrera (+1), interés (+2 cada uno)
-    @GetMapping("/suggested")
+    //AQUI  RECOMIENDA CURSOS AL USUARIO EN BASE A SU PERFIL E INTERESE 
+    @GetMapping("/suggested") //ultimo    
     public ResponseEntity<List<SuggestedCourseResponse>> getSuggestedCourses() {
         List<SuggestedCourseResponse> suggested = catalogService.getSuggestedCourses();
         return ResponseEntity.ok(suggested);
