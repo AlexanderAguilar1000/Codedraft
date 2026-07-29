@@ -25,7 +25,10 @@ import com.proyecto.codedraft.course.dto.CoursePriorityUpdateRequest;
 import com.proyecto.codedraft.course.dto.CourseRecommendationResponse;
 import com.proyecto.codedraft.course.dto.CourseRequest;
 import com.proyecto.codedraft.course.dto.CourseResponse;
+import com.proyecto.codedraft.course.dto.CourseSearchRequest;
+import com.proyecto.codedraft.course.dto.CourseStatsResponse;
 import com.proyecto.codedraft.course.dto.CourseStatusUpdateRequest;
+import com.proyecto.codedraft.course.dto.CourseUpdateRequest;
 import com.proyecto.codedraft.course.dto.ProgressUpdateRequest;
 import com.proyecto.codedraft.course.dto.SuggestedCourseResponse;
 import com.proyecto.codedraft.course.dto.TargetDateUpdateRequest;
@@ -75,6 +78,30 @@ public class CursoController {
         return ResponseEntity.ok(response);
     }
 
+    //busca cursos por filtros (nombre, status, priority, rango de progreso)
+    @GetMapping("/search")
+    public ResponseEntity<List<CourseResponse>> searchCourses(CourseSearchRequest request) {
+        List<Course> courses = courseService.searchCourses(
+                request.getName(),
+                request.getStatus(),
+                request.getPriority(),
+                request.getMinProgress(),
+                request.getMaxProgress()
+        );
+        
+        List<CourseResponse> response = courses.stream()
+                .map(CourseResponse::fromModel)
+                .toList();
+        return ResponseEntity.ok(response);
+    }
+
+    //obtiene estadísticas de los cursos (total, por estado, por prioridad, promedio de progreso)
+    @GetMapping("/stats")
+    public ResponseEntity<CourseStatsResponse> getCourseStats() {
+        CourseStatsResponse stats = courseService.getCourseStats();
+        return ResponseEntity.ok(stats);
+    }
+
     //obtiene el detalle de un curso por ID
     @GetMapping("/{id}")
     public ResponseEntity<CourseResponse> getCourseById(@PathVariable String id) {
@@ -114,6 +141,20 @@ public class CursoController {
     public ResponseEntity<CourseResponse> updateTargetDate(@PathVariable String id,
                                                              @Valid @RequestBody TargetDateUpdateRequest request) {
         Course course = courseService.updateTargetDate(id, request.getTargetDate());
+        return ResponseEntity.ok(CourseResponse.fromModel(course));
+    }
+
+    //actualiza múltiples campos de un curso (status, priority, progress, targetDate)
+    @PatchMapping("/{id}/update")
+    public ResponseEntity<CourseResponse> updateCourse(@PathVariable String id,
+                                                        @Valid @RequestBody CourseUpdateRequest request) {
+        Course course = courseService.updateCourse(
+                id,
+                request.getStatus(),
+                request.getPriority(),
+                request.getProgress(),
+                request.getTargetDate()
+        );
         return ResponseEntity.ok(CourseResponse.fromModel(course));
     }
 

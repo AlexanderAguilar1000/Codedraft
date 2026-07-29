@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.proyecto.codedraft.course.dto.CourseRequest;
+import com.proyecto.codedraft.course.dto.CourseStatsResponse;
 import com.proyecto.codedraft.course.model.Course;
 import com.proyecto.codedraft.course.model.CoursePriority;
 import com.proyecto.codedraft.course.model.CourseStatus;
@@ -72,6 +73,47 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
+    public List<Course> searchCourses(String name, String status, String priority, Integer minProgress, Integer maxProgress) {
+        List<Course> courses = courseRepository.findAll();
+        
+        if (courses == null) {
+            throw new IllegalStateException("Error al obtener la lista de cursos");
+        }
+
+        return courses.stream()
+                .filter(course -> name == null || name.isEmpty() || 
+                        course.getName().toLowerCase().contains(name.toLowerCase()))
+                .filter(course -> status == null || status.isEmpty() || 
+                        course.getStatus().name().equalsIgnoreCase(status))
+                .filter(course -> priority == null || priority.isEmpty() || 
+                        course.getPriority().name().equalsIgnoreCase(priority))
+                .filter(course -> minProgress == null || course.getProgress() >= minProgress)
+                .filter(course -> maxProgress == null || course.getProgress() <= maxProgress)
+                .toList();
+    }
+
+    public CourseStatsResponse getCourseStats() {
+        List<Course> courses = courseRepository.findAll();
+        
+        if (courses == null) {
+            throw new IllegalStateException("Error al obtener la lista de cursos");
+        }
+
+        int totalCourses = courses.size();
+        int notStarted = (int) courses.stream().filter(c -> c.getStatus() == CourseStatus.NO_INICIADO).count();
+        int inProgress = (int) courses.stream().filter(c -> c.getStatus() == CourseStatus.EN_CURSO).count();
+        int completed = (int) courses.stream().filter(c -> c.getStatus() == CourseStatus.COMPLETADO).count();
+        int highPriority = (int) courses.stream().filter(c -> c.getPriority() == CoursePriority.ALTA).count();
+        int mediumPriority = (int) courses.stream().filter(c -> c.getPriority() == CoursePriority.MEDIA).count();
+        int lowPriority = (int) courses.stream().filter(c -> c.getPriority() == CoursePriority.BAJA).count();
+        
+        double averageProgress = courses.isEmpty() ? 0.0 : 
+                courses.stream().mapToInt(Course::getProgress).average().orElse(0.0);
+
+        return new CourseStatsResponse(totalCourses, notStarted, inProgress, completed,
+                highPriority, mediumPriority, lowPriority, averageProgress);
+    }
+
     public Course getCourseById(String id) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID del curso es obligatorio");
@@ -127,6 +169,48 @@ public class CourseService {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
         course.setTargetDate(targetDate);
+        courseRepository.saveAll(courses);
+        return course;
+    }
+
+    //actualiza múltiples campos de un curso (status, priority, progress, targetDate)
+    public Course updateCourse(String id, String status, String priority, Integer progress, LocalDate targetDate) {
+        if (id == null || id.trim().isEmpty()) {
+            throw new IllegalArgumentException("El ID del curso es obligatorio");
+        }
+
+        List<Course> courses = courseRepository.findAll();
+        if (courses == null) {
+            throw new IllegalStateException("Error al obtener la lista de cursos");
+        }
+
+        Course course = findByIdOrThrow(courses, id);
+
+        // Actualizar status si se proporciona
+        if (StringUtils.hasText(status)) {
+            CourseStatus newStatus = parseStatus(status);
+            course.setStatus(newStatus);
+        }
+
+        // Actualizar priority si se proporciona
+        if (StringUtils.hasText(priority)) {
+            CoursePriority newPriority = parsePriority(priority);
+            course.setPriority(newPriority);
+        }
+
+        // Actualizar progress si se proporciona
+        if (progress != null) {
+            course.setProgress(progress);
+        }
+
+        // Actualizar targetDate si se proporciona
+        if (targetDate != null) {
+            course.setTargetDate(targetDate);
+        }
+
+        // Validar consistencia entre status y progress después de las actualizaciones
+        validateStatusProgressConsistency(course.getStatus(), course.getProgress());
+
         courseRepository.saveAll(courses);
         return course;
     }
