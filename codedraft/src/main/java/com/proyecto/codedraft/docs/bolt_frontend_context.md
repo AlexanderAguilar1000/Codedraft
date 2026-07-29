@@ -57,23 +57,31 @@ CodeCraftHub es una plataforma web que ayuda a desarrolladores autodidactas a or
 
 2. **Registro de un nuevo curso** — Formulario para crear un curso con nombre, descripción, estado, prioridad, fecha objetivo y progreso. Estado por defecto "No iniciado" y progreso por defecto 0. El curso creado aparece de inmediato en la lista.
 
-3. **Listado de cursos registrados** — Vista de tabla/lista que muestra nombre, estado, prioridad, fecha objetivo y progreso de cada curso. Muestra un mensaje cuando la lista está vacía o si el backend no responde.
+3. **KPIs de estadísticas de cursos** — Tarjetas de indicadores clave de rendimiento que muestran estadísticas generales de los cursos (total de cursos, no iniciados, en curso, completados, prioridades, progreso promedio). Se muestran encima de la lista de cursos.
 
-4. **Cambio de estado del curso** — Selector editable (No iniciado / En curso / Completado) directamente desde la lista, sin recargar la página.
+4. **Búsqueda de cursos** — Barra de navegación/filtros encima de la lista de cursos que permite buscar por nombre, filtrar por estado, prioridad y rango de progreso. Los resultados se actualizan dinámicamente.
 
-5. **Actualización de prioridad** — Selector editable (Alta / Media / Baja) desde la lista, con guardado inmediato.
+5. **Listado de cursos registrados** — Vista de tabla/lista que muestra nombre, estado, prioridad, fecha objetivo y progreso de cada curso. Incluye una columna de acciones con botones para ver detalle, editar y eliminar cada curso. Muestra un mensaje cuando la lista está vacía o si el backend no responde.
 
-6. **Actualización de fecha objetivo** — Selector de fecha (datepicker) editable desde la lista, con validación de formato.
+6. **Detalle del curso** — Vista modal o página que muestra la información completa de un curso específico (nombre, descripción, estado, prioridad, fecha objetivo, progreso). Se accede desde el botón de ver detalle en la lista.
 
-7. **Actualización de progreso** — Control tipo slider/input (rango 0–100) que envía la actualización al backend; si el progreso llega a 100 el curso pasa automáticamente a "Completado". Cada actualización exitosa suma puntos de experiencia (ver funcionalidad 10).
+7. **Edición del curso** — Formulario para editar múltiples campos de un curso existente (nombre, descripción, estado, prioridad, fecha objetivo, progreso). Se accede desde el botón de editar en la lista. Al guardar, el curso se actualiza en la lista.
 
-8. **Eliminación de un curso** — Botón de eliminar con diálogo de confirmación; el curso desaparece de la lista al confirmar.
+8. **Eliminación de un curso** — Botón de eliminar con diálogo de confirmación en la columna de acciones; el curso desaparece de la lista al confirmar.
 
-9. **Recomendación del siguiente curso a estudiar** — Tarjeta en el dashboard que muestra el curso recomendado según prioridad, estado y fecha objetivo, o un mensaje de "sin cursos pendientes" si no hay ninguno.
+9. **Cambio de estado del curso** — Selector editable (No iniciado / En curso / Completado) directamente desde la lista, sin recargar la página.
 
-10. **Cursos sugeridos personalizados** — Tras completar el perfil, se muestra una lista de tarjetas con cursos sugeridos del catálogo, ordenados por relevancia (score) según el rol, carrera e intereses del usuario.
+10. **Actualización de prioridad** — Selector editable (Alta / Media / Baja) desde la lista, con guardado inmediato.
 
-11. **Puntos de experiencia** — El header/dashboard muestra el total de puntos de experiencia acumulados, actualizándose visualmente tras cada actualización de progreso.
+11. **Actualización de fecha objetivo** — Selector de fecha (datepicker) editable desde la lista, con validación de formato.
+
+12. **Actualización de progreso** — Control tipo slider/input (rango 0–100) que envía la actualización al backend; si el progreso llega a 100 el curso pasa automáticamente a "Completado". Cada actualización exitosa suma puntos de experiencia (ver funcionalidad 13).
+
+13. **Recomendación del siguiente curso a estudiar** — Tarjeta en el dashboard que muestra el curso recomendado según prioridad, estado y fecha objetivo, o un mensaje de "sin cursos pendientes" si no hay ninguno.
+
+14. **Cursos sugeridos personalizados** — Tras completar el perfil, se muestra una lista de tarjetas con cursos sugeridos del catálogo, ordenados por relevancia (score) según el rol, carrera e intereses del usuario.
+
+15. **Puntos de experiencia** — El header/dashboard muestra el total de puntos de experiencia acumulados, actualizándose visualmente tras cada actualización de progreso.
 
 > **Fuera de alcance por ahora:** mensajes motivadores del coach, perfil de aprendizaje generado por IA y el personaje "Mentor Backend" (historias HU-012, HU-013 y HU-014) — su backend todavía no está desarrollado, por lo que el frontend no debe intentar consumir esos endpoints.
 
