@@ -425,11 +425,13 @@ Si no hay cursos: `[]`.
 
 ---
 
-#### `PATCH /api/courses/{id}/update` — Actualizar múltiples campos de un curso (status, priority, progress, targetDate)
+#### `PATCH /api/courses/{id}/update` — Actualizar múltiples campos de un curso (name, description, status, priority, progress, targetDate)
 
 **Request (todos los campos son opcionales):**
 ```json
 {
+  "name": "Spring Boot Avanzado",
+  "description": "Curso avanzado de microservicios con Spring Boot.",
   "status": "EN_CURSO",
   "priority": "ALTA",
   "progress": 50,
@@ -441,8 +443,8 @@ Si no hay cursos: `[]`.
 ```json
 {
   "id": "3f2f1a2c-9b7a-4a1d-9d3a-6b0c8b5e1234",
-  "name": "Spring Boot desde cero",
-  "description": "Curso de fundamentos de Spring Boot y Spring Web.",
+  "name": "Spring Boot Avanzado",
+  "description": "Curso avanzado de microservicios con Spring Boot.",
   "status": "EN_CURSO",
   "priority": "ALTA",
   "targetDate": "2026-10-30",
@@ -450,7 +452,21 @@ Si no hay cursos: `[]`.
 }
 ```
 
-**Response 400 (error de validación):**
+**Response 400 (error de validación - nombre duplicado):**
+```json
+{
+  "message": "Ya existe un curso con el nombre: Spring Boot Avanzado"
+}
+```
+
+**Response 400 (error de validación - fecha pasada):**
+```json
+{
+  "message": "La fecha objetivo debe ser una fecha futura"
+}
+```
+
+**Response 400 (error de validación - consistencia status/progress):**
 ```json
 {
   "message": "Un curso en curso debe tener un progreso entre 1% y 99%"
