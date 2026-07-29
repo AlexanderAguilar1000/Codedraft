@@ -8,6 +8,10 @@ import jakarta.validation.constraints.Min;
 
 public class CourseUpdateRequest {
 
+    private String name;
+
+    private String description;
+
     private String status;
 
     private String priority;
@@ -20,6 +24,22 @@ public class CourseUpdateRequest {
     private LocalDate targetDate;
 
     public CourseUpdateRequest() {
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getStatus() {

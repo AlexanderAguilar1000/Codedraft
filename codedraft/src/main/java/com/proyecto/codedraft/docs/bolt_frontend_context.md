@@ -401,6 +401,119 @@ Si no hay cursos: `[]`.
 
 ---
 
+#### `GET /api/courses/{id}` — Obtener el detalle de un curso por ID
+
+**Response 200:**
+```json
+{
+  "id": "3f2f1a2c-9b7a-4a1d-9d3a-6b0c8b5e1234",
+  "name": "Spring Boot desde cero",
+  "description": "Curso de fundamentos de Spring Boot y Spring Web.",
+  "status": "EN_CURSO",
+  "priority": "ALTA",
+  "targetDate": "2026-09-30",
+  "progress": 40
+}
+```
+
+**Response 404:**
+```json
+{
+  "message": "No se encontro un curso con id 3f2f1a2c-9b7a-4a1d-9d3a-6b0c8b5e1234"
+}
+```
+
+---
+
+#### `PATCH /api/courses/{id}/update` — Actualizar múltiples campos de un curso (status, priority, progress, targetDate)
+
+**Request (todos los campos son opcionales):**
+```json
+{
+  "status": "EN_CURSO",
+  "priority": "ALTA",
+  "progress": 50,
+  "targetDate": "2026-10-30"
+}
+```
+
+**Response 200:**
+```json
+{
+  "id": "3f2f1a2c-9b7a-4a1d-9d3a-6b0c8b5e1234",
+  "name": "Spring Boot desde cero",
+  "description": "Curso de fundamentos de Spring Boot y Spring Web.",
+  "status": "EN_CURSO",
+  "priority": "ALTA",
+  "targetDate": "2026-10-30",
+  "progress": 50
+}
+```
+
+**Response 400 (error de validación):**
+```json
+{
+  "message": "Un curso en curso debe tener un progreso entre 1% y 99%"
+}
+```
+
+**Response 404:**
+```json
+{
+  "message": "No se encontro un curso con id 3f2f1a2c-9b7a-4a1d-9d3a-6b0c8b5e1234"
+}
+```
+
+---
+
+#### `GET /api/courses/search` — Buscar cursos por filtros (nombre, status, priority, rango de progreso)
+
+**Query Parameters (todos opcionales):**
+- `name`: filtro por nombre (búsqueda parcial, case-insensitive)
+- `status`: filtro por estado exacto (NO_INICIADO, EN_CURSO, COMPLETADO)
+- `priority`: filtro por prioridad exacta (ALTA, MEDIA, BAJA)
+- `minProgress`: progreso mínimo (inclusive)
+- `maxProgress`: progreso máximo (inclusive)
+
+**Ejemplo:** `GET /api/courses/search?name=java&status=EN_CURSO&minProgress=20&maxProgress=80`
+
+**Response 200:**
+```json
+[
+  {
+    "id": "3f2f1a2c-9b7a-4a1d-9d3a-6b0c8b5e1234",
+    "name": "Java Avanzado",
+    "description": "Curso avanzado de Java",
+    "status": "EN_CURSO",
+    "priority": "ALTA",
+    "targetDate": "2026-09-30",
+    "progress": 40
+  }
+]
+```
+
+Si no hay resultados: `[]`.
+
+---
+
+#### `GET /api/courses/stats` — Obtener estadísticas de los cursos
+
+**Response 200:**
+```json
+{
+  "totalCourses": 10,
+  "notStarted": 3,
+  "inProgress": 5,
+  "completed": 2,
+  "highPriority": 4,
+  "mediumPriority": 4,
+  "lowPriority": 2,
+  "averageProgress": 45.5
+}
+```
+
+---
+
 ### Módulo: Recomendaciones y catálogo
 
 #### `GET /api/courses/recommendation` — Obtener el siguiente curso recomendado

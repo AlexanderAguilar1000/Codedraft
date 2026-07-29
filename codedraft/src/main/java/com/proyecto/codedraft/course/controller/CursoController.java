@@ -144,12 +144,14 @@ public class CursoController {
         return ResponseEntity.ok(CourseResponse.fromModel(course));
     }
 
-    //actualiza múltiples campos de un curso (status, priority, progress, targetDate)
+    //actualiza múltiples campos de un curso (name, description, status, priority, progress, targetDate)
     @PatchMapping("/{id}/update")
     public ResponseEntity<CourseResponse> updateCourse(@PathVariable String id,
                                                         @Valid @RequestBody CourseUpdateRequest request) {
         Course course = courseService.updateCourse(
                 id,
+                request.getName(),
+                request.getDescription(),
                 request.getStatus(),
                 request.getPriority(),
                 request.getProgress(),

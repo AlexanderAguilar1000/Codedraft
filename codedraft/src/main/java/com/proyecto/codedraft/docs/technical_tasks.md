@@ -89,7 +89,11 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 | PATCH | `/api/courses/{id}/priority` | Actualizar la prioridad de un curso. |
 | PATCH | `/api/courses/{id}/target-date` | Actualizar la fecha objetivo de un curso. |
 | PATCH | `/api/courses/{id}/progress` | Actualizar el progreso de un curso (dispara coach y puntos de experiencia). |
+| PATCH | `/api/courses/{id}/update` | Actualizar múltiples campos de un curso (status, priority, progress, targetDate) en una sola llamada. |
 | DELETE | `/api/courses/{id}` | Eliminar un curso. |
+| GET | `/api/courses/{id}` | Obtener el detalle de un curso por ID. |
+| GET | `/api/courses/search` | Buscar cursos por filtros (nombre, status, priority, rango de progreso). |
+| GET | `/api/courses/stats` | Obtener estadísticas de los cursos (total, por estado, por prioridad, promedio de progreso). |
 | GET | `/api/courses/recommendation` | Obtener el siguiente curso recomendado. |
 | GET | `/api/courses/suggested` | Obtener cursos sugeridos del catálogo según el perfil. |
 

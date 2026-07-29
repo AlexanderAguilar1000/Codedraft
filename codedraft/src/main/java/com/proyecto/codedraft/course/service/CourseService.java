@@ -173,8 +173,8 @@ public class CourseService {
         return course;
     }
 
-    //actualiza múltiples campos de un curso (status, priority, progress, targetDate)
-    public Course updateCourse(String id, String status, String priority, Integer progress, LocalDate targetDate) {
+    //actualiza múltiples campos de un curso (name, description, status, priority, progress, targetDate)
+    public Course updateCourse(String id, String name, String description, String status, String priority, Integer progress, LocalDate targetDate) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID del curso es obligatorio");
         }
@@ -185,6 +185,23 @@ public class CourseService {
         }
 
         Course course = findByIdOrThrow(courses, id);
+
+        // Actualizar name si se proporciona
+        if (StringUtils.hasText(name)) {
+            // Validar que no exista otro curso con el mismo nombre
+            boolean nameExists = courses.stream()
+                    .filter(c -> !c.getId().equals(id)) // Excluir el curso actual
+                    .anyMatch(c -> c.getName().equalsIgnoreCase(name));
+            if (nameExists) {
+                throw new IllegalArgumentException("Ya existe un curso con el nombre: " + name);
+            }
+            course.setName(name);
+        }
+
+        // Actualizar description si se proporciona
+        if (description != null) {
+            course.setDescription(description);
+        }
 
         // Actualizar status si se proporciona
         if (StringUtils.hasText(status)) {
@@ -205,6 +222,9 @@ public class CourseService {
 
         // Actualizar targetDate si se proporciona
         if (targetDate != null) {
+            if (targetDate.isBefore(LocalDate.now())) {
+                throw new IllegalArgumentException("La fecha objetivo debe ser una fecha futura");
+            }
             course.setTargetDate(targetDate);
         }
 
