@@ -67,7 +67,7 @@ export async function getCourse(id) {
 
 // POST /api/courses
 export async function createCourse(course) {
-  const res = await fetch(`${API_BASE}/api/courses`, {
+  const res = await fetch(`${API_BASE}/api/courses/registerCurso`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(course),
