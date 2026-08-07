@@ -8,6 +8,7 @@ import {
   getCourses, getSuggestedCourses,
 } from '../services/api.js';
 import { icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel, spinnerHTML } from '../utils/ui.js';
+import { computeLevel, getStudyStreak } from '../utils/gamification.js';
 import { navigate } from '../router.js';
 
 export async function renderDashboard(root) {
@@ -45,6 +46,9 @@ function dashboardHTML(state, recommendation) {
   const courses = state.courses || [];
   const inProgress = courses.filter((c) => c.status === 'EN_CURSO').sort((a, b) => b.progress - a.progress).slice(0, 4);
   const hasRec = recommendation && recommendation.id;
+  const xp = state.experiencePoints ?? 0;
+  const level = computeLevel(xp);
+  const streak = getStudyStreak();
 
   return `
     <div class="dash-hero">
@@ -52,11 +56,12 @@ function dashboardHTML(state, recommendation) {
         <h2>Hola, ${escapeHtml(profile.rol || 'estudiante')}</h2>
         <p>${inProgress.length > 0 ? `Tienes <strong style="color:var(--teal)">${inProgress.length}</strong> curso(s) en curso. ¡Sigue con ese impulso!` : 'Comienza agregando un curso para ver tu progreso aquí.'}</p>
         <div class="welcome-card__xp">
-          ${icon('flame', 26)}
+          <span style="color:var(--gold)">${icon('zap', 26)}</span>
           <div>
-            <div class="welcome-card__xp-num">${state.experiencePoints ?? 0}</div>
+            <div class="welcome-card__xp-num">${xp} <span style="font-size:0.9rem;color:var(--gold);font-weight:700">· Nv.${level.level}</span></div>
             <div class="welcome-card__xp-label">Puntos de experiencia</div>
           </div>
+          <span class="streak-chip" style="margin-left:auto">${icon('flame', 15)} ${streak} ${streak === 1 ? 'día' : 'días'}</span>
         </div>
       </div>
 

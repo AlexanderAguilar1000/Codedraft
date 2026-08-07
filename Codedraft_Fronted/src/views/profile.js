@@ -2,9 +2,10 @@
 // Endpoints: GET /api/profile, POST /api/profile, GET /api/profile/points
 
 import { getState, setState, setLoading } from '../state/store.js';
-import { createProfile, getProfile, getExperiencePoints } from '../services/api.js';
+import { createProfile, getProfile, getExperiencePoints, getCourseStats, getRecommendedCourse } from '../services/api.js';
 import { roleOptions, careerOptions, interestOptions } from '../data/mockData.js';
-import { icon, showToast, escapeHtml, xpRing } from '../utils/ui.js';
+import { icon, showToast, escapeHtml, xpRing, progressRing, formatDate } from '../utils/ui.js';
+import { computeLevel, getStudyStreak, buildAchievements } from '../utils/gamification.js';
 import { navigate } from '../router.js';
 
 let selectedInterests = [];
@@ -14,10 +15,18 @@ export async function renderProfile(root) {
   // Fetch latest profile + XP from backend on each visit.
   setLoading('profile', true);
   let profile = null;
+  let stats = null;
+  let recommendation = null;
   try {
     profile = await getProfile();
     const xp = await getExperiencePoints();
     setState({ profile, hasProfile: true, experiencePoints: xp.experiencePoints ?? 0 });
+    // Extra context for the progress/gamification section — same endpoints the dashboard already uses.
+    [stats, recommendation] = await Promise.all([
+      getCourseStats().catch(() => null),
+      getRecommendedCourse().catch(() => null),
+    ]);
+    setState({ stats: stats || getState().stats });
   } catch (err) {
     if (err.code === 'PROFILE_NOT_FOUND' || err.status === 404) {
       setState({ profile: null, hasProfile: false });
@@ -30,11 +39,11 @@ export async function renderProfile(root) {
 
   selectedInterests = profile ? [...(profile.intereses || [])] : [];
   const fresh = getState();
-  root.innerHTML = pageHTML(fresh);
+  root.innerHTML = pageHTML(fresh, stats, recommendation);
   bindForm(root);
 }
 
-function pageHTML(state) {
+function pageHTML(state, stats, recommendation) {
   const profile = state.profile;
   const isOnboarding = !profile;
   const xp = state.experiencePoints ?? 0;
@@ -46,12 +55,14 @@ function pageHTML(state) {
         <p class="page-head__subtitle">Configura tu rol, carrera e intereses para recibir recomendaciones personalizadas.</p>
       </div>
       <div class="xp-widget">
-        <div class="xp-pill"><span class="xp-pill__flame">${icon('flame', 15)}</span><span class="xp-pill__value">${xp}</span> XP</div>
+        <div class="xp-pill"><span class="xp-pill__flame">${icon('zap', 15)}</span><span class="xp-pill__value">${xp}</span> XP</div>
         ${xpRing(xp)}
       </div>
     </div>
 
     ${isOnboarding ? `<div class="onboard-hero"><h1>¡Bienvenido a CodeCraftHub!</h1><p>Completa tu perfil para empezar a organizar y priorizar tus cursos de aprendizaje.</p></div>` : ''}
+
+    ${profile ? gamificationHTML(xp, stats || {}, recommendation) : ''}
 
     <div class="${profile ? 'profile-card-grid' : ''}">
       <div class="card">
@@ -59,6 +70,89 @@ function pageHTML(state) {
         <div class="card__body">${profileFormHTML(profile, isOnboarding)}</div>
       </div>
       ${profile ? summaryCardHTML(profile) : ''}
+    </div>
+  `;
+}
+
+// "Live" progress + gamification section: streak, XP/level, achievements and current goal —
+// all derived from data the app already fetches (profile, XP, course stats/recommendation).
+function gamificationHTML(xp, stats, recommendation) {
+  const streak = getStudyStreak();
+  const level = computeLevel(xp);
+  const achievements = buildAchievements({ hasProfile: true, streak, level: level.level, stats });
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const completed = stats.completed ?? 0;
+  const total = stats.totalCourses ?? 0;
+  const hasRec = recommendation && recommendation.id;
+
+  return `
+    <section class="game-section">
+      <div class="game-grid">
+        <div class="game-tile game-tile--streak ${streak > 0 ? 'is-active' : ''}">
+          <div class="game-tile__top"><span class="game-tile__icon">${icon('flame', 18)}</span></div>
+          <div class="game-tile__value">${streak}</div>
+          <div class="game-tile__label">Racha de estudio</div>
+          <div class="game-tile__sub">${streak > 1 ? `${streak} días seguidos` : '¡Sigue así hoy!'}</div>
+        </div>
+        <div class="game-tile game-tile--gold">
+          <div class="game-tile__top"><span class="game-tile__icon">${icon('zap', 18)}</span></div>
+          <div class="game-tile__value">${xp}</div>
+          <div class="game-tile__label">Experiencia (XP)</div>
+          <div class="game-tile__sub">${icon('rocket', 12)} Nivel ${level.level}</div>
+        </div>
+        <div class="game-tile game-tile--blue">
+          <div class="game-tile__top"><span class="game-tile__icon">${icon('book', 18)}</span></div>
+          <div class="game-tile__value">${completed}</div>
+          <div class="game-tile__label">Cursos completados</div>
+          <div class="game-tile__sub">${total} en total</div>
+        </div>
+        <div class="game-tile game-tile--purple">
+          <div class="game-tile__top"><span class="game-tile__icon">${icon('trophy', 18)}</span></div>
+          <div class="game-tile__value">${unlockedCount}/${achievements.length}</div>
+          <div class="game-tile__label">Logros desbloqueados</div>
+          <div class="game-tile__sub">Objetivo: desbloquear todos</div>
+        </div>
+      </div>
+
+      <div class="game-row">
+        <div class="level-card">
+          ${progressRing(level.pct, 84, 8, `Nv.${level.level}`, 'gold')}
+          <div class="level-card__info">
+            <h3>Nivel ${level.level}</h3>
+            <p>${level.xpIntoLevel} / ${level.xpForNext} XP para el siguiente nivel</p>
+            <div class="progress"><div class="progress__bar level-bar" style="width:${level.pct}%"></div></div>
+          </div>
+        </div>
+        <div class="objective-card">
+          <div class="objective-card__head">${icon('target', 16)} Objetivo actual</div>
+          ${hasRec ? `
+            <div class="objective-card__name">${escapeHtml(recommendation.name)}</div>
+            <div class="objective-card__meta">
+              <span class="chip">${icon('clock', 12)} ${recommendation.targetDate ? formatDate(recommendation.targetDate) : 'Sin fecha límite'}</span>
+              <span>Próximo curso recomendado según tu progreso.</span>
+            </div>
+          ` : `<div class="objective-card__empty">Agrega o inicia un curso para fijar tu próximo objetivo.</div>`}
+        </div>
+      </div>
+
+      <div class="achievements-card">
+        <div class="section-title">${icon('trophy', 17)} Logros</div>
+        <div class="achievements-grid">
+          ${achievements.map(achievementHTML).join('')}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function achievementHTML(a) {
+  return `
+    <div class="achievement ${a.unlocked ? 'is-unlocked' : 'is-locked'}">
+      <span class="achievement__icon">${icon(a.icon, 16)}</span>
+      <div>
+        <div class="achievement__title">${a.title}</div>
+        <div class="achievement__desc">${a.desc}</div>
+      </div>
     </div>
   `;
 }
@@ -112,7 +206,7 @@ function summaryCardHTML(profile) {
     <div class="card">
       <div class="card__header">
         <span class="card__title">Resumen</span>
-        <div class="xp-pill"><span class="xp-pill__flame">${icon('flame', 14)}</span>${xp} XP</div>
+        <div class="xp-pill"><span class="xp-pill__flame">${icon('zap', 14)}</span>${xp} XP</div>
       </div>
       <div class="card__body">
         <div class="profile-summary">

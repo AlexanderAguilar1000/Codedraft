@@ -1,5 +1,6 @@
 import './src/styles/global.css';
 import './src/styles/views.css';
+import './src/styles/gamification.css';
 import { initRouter } from './src/router.js';
 
 // Build the app shell, then start the router.

@@ -1,0 +1,152 @@
+/* ==========================================================================
+   CodeCraftHub — Gamification layer (streak, XP/level, achievements, goals)
+   ========================================================================== */
+
+.game-section { display: flex; flex-direction: column; gap: var(--s-5); margin-bottom: var(--s-6); }
+
+/* Stat tiles (streak / XP / completed / achievements)
+   -------------------------------------------------------------------------- */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: var(--s-4);
+}
+.game-tile {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+  animation: pop-in var(--dur-slower) var(--ease-out) both;
+}
+.game-tile::before {
+  content: '';
+  position: absolute; inset: 0 auto auto 0;
+  width: 100%; height: 3px;
+  background: var(--tile-grad, var(--grad-teal));
+}
+.game-tile::after {
+  content: '';
+  position: absolute; right: -30px; top: -30px;
+  width: 110px; height: 110px; border-radius: 50%;
+  background: var(--tile-glow, var(--teal-glow));
+  filter: blur(30px);
+  opacity: 0.5;
+}
+.game-tile:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--tile-shadow, var(--shadow-hover)); }
+.game-tile__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-3); position: relative; }
+.game-tile__icon {
+  width: 38px; height: 38px; border-radius: var(--r-md);
+  display: grid; place-items: center;
+  background: var(--tile-bg, var(--teal-subtle));
+  color: var(--tile-color, var(--teal));
+}
+.game-tile__icon svg { width: 19px; height: 19px; }
+.game-tile__value { font-size: 1.6rem; font-weight: 800; line-height: 1; color: var(--heading); font-variant-numeric: tabular-nums; position: relative; }
+.game-tile__label { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; font-weight: 600; position: relative; }
+.game-tile__sub { font-size: 0.74rem; color: var(--tile-color, var(--teal)); margin-top: var(--s-2); font-weight: 600; position: relative; display: flex; align-items: center; gap: 4px; }
+
+.game-tile--streak { --tile-grad: var(--grad-streak); --tile-glow: var(--streak-glow); --tile-bg: var(--streak-bg); --tile-color: var(--streak); --tile-shadow: var(--shadow-streak); }
+.game-tile--gold   { --tile-grad: var(--grad-gold);   --tile-glow: var(--gold-glow);   --tile-bg: var(--gold-bg);   --tile-color: var(--gold);   --tile-shadow: var(--shadow-gold); }
+.game-tile--blue   { --tile-grad: var(--grad-blue);   --tile-glow: var(--stat-blue-glow); --tile-bg: var(--stat-blue-bg); --tile-color: var(--stat-blue); --tile-shadow: var(--shadow-blue); }
+.game-tile--purple { --tile-grad: var(--grad-purple); --tile-glow: var(--purple-glow); --tile-bg: var(--purple-bg); --tile-color: var(--purple); --tile-shadow: var(--shadow-purple); }
+
+.game-tile--streak.is-active .game-tile__icon svg { animation: pulse-glow 2.2s ease-in-out infinite; }
+
+.game-tile:nth-child(1) { animation-delay: 0ms; }
+.game-tile:nth-child(2) { animation-delay: 60ms; }
+.game-tile:nth-child(3) { animation-delay: 120ms; }
+.game-tile:nth-child(4) { animation-delay: 180ms; }
+
+/* Level + objective row
+   -------------------------------------------------------------------------- */
+.game-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--s-4);
+}
+@media (max-width: 720px) { .game-row { grid-template-columns: 1fr; } }
+
+.level-card, .objective-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--s-5);
+}
+.level-card {
+  display: flex; align-items: center; gap: var(--s-5);
+  background: linear-gradient(135deg, rgba(255,194,51,0.07), var(--bg-card) 55%);
+}
+.level-card__info h3 { font-size: 1.05rem; margin-bottom: 2px; }
+.level-card__info p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: var(--s-3); }
+.level-card__info .progress { width: 140px; }
+.level-bar { background: var(--grad-gold) !important; }
+
+.objective-card { background: linear-gradient(135deg, rgba(76,141,255,0.07), var(--bg-card) 55%); }
+.objective-card__head {
+  display: flex; align-items: center; gap: var(--s-2);
+  color: var(--stat-blue); font-weight: 700; font-size: 0.75rem;
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: var(--s-4);
+}
+.objective-card__name { font-size: 1.1rem; font-weight: 700; color: var(--heading); margin-bottom: var(--s-2); }
+.objective-card__meta { display: flex; flex-wrap: wrap; gap: var(--s-2); align-items: center; font-size: 0.82rem; color: var(--text-muted); }
+.objective-card__empty { color: var(--text-muted); font-size: 0.86rem; }
+
+/* Achievements
+   -------------------------------------------------------------------------- */
+.achievements-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: var(--s-5); }
+.achievements-card .section-title { margin-bottom: var(--s-4); }
+.achievements-card .section-title svg { color: var(--purple); }
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: var(--s-3);
+}
+.achievement {
+  display: flex; align-items: center; gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  animation: pop-in var(--dur-slower) var(--ease-out) both;
+}
+.achievement__icon {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center; flex-shrink: 0;
+  background: rgba(255,255,255,0.05); color: var(--text-muted);
+}
+.achievement__icon svg { width: 17px; height: 17px; }
+.achievement__title { font-size: 0.84rem; font-weight: 700; color: var(--text-soft); }
+.achievement__desc { font-size: 0.72rem; color: var(--text-muted); margin-top: 1px; }
+
+.achievement.is-unlocked {
+  border-color: rgba(168,85,247,0.28);
+  background: linear-gradient(135deg, var(--purple-bg), var(--bg-elevated) 70%);
+  box-shadow: 0 4px 16px rgba(168,85,247,0.12);
+}
+.achievement.is-unlocked .achievement__icon { background: var(--grad-purple); color: #1a0d29; box-shadow: 0 0 12px var(--purple-glow); }
+.achievement.is-unlocked .achievement__title { color: var(--heading); }
+.achievement.is-locked { opacity: 0.55; }
+.achievement:hover { transform: translateY(-2px); }
+
+/* Header streak chip (dashboard hero)
+   -------------------------------------------------------------------------- */
+.streak-chip {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: var(--streak-bg);
+  border: 1px solid rgba(255,107,53,0.28);
+  color: var(--streak);
+  font-weight: 700; font-size: 0.9rem;
+  white-space: nowrap;
+}
+.streak-chip svg { animation: pulse-glow 2.2s ease-in-out infinite; }
+
+@media (max-width: 560px) {
+  .game-tile__value { font-size: 1.3rem; }
+  .level-card { flex-direction: column; text-align: center; }
+  .level-card__info .progress { width: 100%; margin: 0 auto; }
+}

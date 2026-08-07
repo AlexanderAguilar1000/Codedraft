@@ -166,12 +166,13 @@ export function icon(name, size = 18, className = 'icon') {
 }
 
 // Circular SVG progress ring. `value` 0-100, `size` in px, `strokeWidth` px.
-export function progressRing(value, size = 80, strokeWidth = 6, label = '') {
+// `tone` optionally colors the bar: 'gold' | 'streak' | 'blue' | 'purple' (defaults to teal).
+export function progressRing(value, size = 80, strokeWidth = 6, label = '', tone = '') {
   const r = (size - strokeWidth) / 2;
   const c = 2 * Math.PI * r;
   const pct = Math.max(0, Math.min(100, value));
   const offset = c - (pct / 100) * c;
-  return `<div class="ring-wrap" style="width:${size}px;height:${size}px">
+  return `<div class="ring-wrap ${tone ? 'ring-wrap--' + tone : ''}" style="width:${size}px;height:${size}px">
     <svg width="${size}" height="${size}">
       <circle class="ring-track" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${strokeWidth}"/>
       <circle class="ring-bar" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${strokeWidth}"

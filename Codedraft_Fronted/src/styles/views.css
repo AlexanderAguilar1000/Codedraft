@@ -47,6 +47,7 @@
 .welcome-card p { color: var(--text-soft); font-size: 0.92rem; position: relative; max-width: 480px; }
 .welcome-card__xp {
   display: flex; align-items: center; gap: var(--s-4);
+  flex-wrap: wrap;
   margin-top: var(--s-6);
   padding-top: var(--s-5);
   border-top: 1px solid var(--border-mid);
