@@ -49,9 +49,7 @@ public class CourseService {
             throw new IllegalArgumentException("Ya existe un curso con el nombre: " + request.getName());
         }
 
-        CourseStatus status = StringUtils.hasText(request.getStatus())
-                ? parseStatus(request.getStatus())//obtener el estado
-                : CourseStatus.NO_INICIADO;
+        CourseStatus status = CourseStatus.NO_INICIADO; // El status siempre inicia como NO_INICIADO al crear un curso
         CoursePriority priority = StringUtils.hasText(request.getPriority())
                 ? parsePriority(request.getPriority()) //obtener la prioridad
                 : CoursePriority.MEDIA;

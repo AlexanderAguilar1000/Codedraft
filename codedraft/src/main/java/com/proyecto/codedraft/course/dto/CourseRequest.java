@@ -11,8 +11,6 @@ public class CourseRequest {
 
     private String description;
 
-    private String status;
-
     private String priority;
 
     @NotNull(message = "La fecha objetivo es obligatoria")
@@ -36,14 +34,6 @@ public class CourseRequest {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getPriority() {
