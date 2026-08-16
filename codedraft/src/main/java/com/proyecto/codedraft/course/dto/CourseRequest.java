@@ -19,10 +19,6 @@ public class CourseRequest {
     @Future(message = "La fecha objetivo debe ser una fecha futura")
     private LocalDate targetDate;
 
-    @Min(value = 0, message = "El progreso debe estar entre 0 y 100")
-    @Max(value = 100, message = "El progreso debe estar entre 0 y 100")
-    private Integer progress;
-
     public CourseRequest() {
     }
 
@@ -66,11 +62,4 @@ public class CourseRequest {
         this.targetDate = targetDate;
     }
 
-    public Integer getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Integer progress) {
-        this.progress = progress;
-    }
 }

@@ -56,7 +56,7 @@ public class CourseService {
                 ? parsePriority(request.getPriority()) //obtener la prioridad
                 : CoursePriority.MEDIA;
         LocalDate targetDate = request.getTargetDate(); // Ya viene validado como LocalDate desde el DTO
-        int progress = request.getProgress() != null ? request.getProgress() : 0;
+        int progress = 0; // El progreso siempre inicia en 0 al crear un curso
 
         // Validar consistencia entre status y progress
         validateStatusProgressConsistency(status, progress);
