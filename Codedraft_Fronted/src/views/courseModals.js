@@ -13,7 +13,7 @@ import { refreshCourses } from './courses.js';
 // ADD -----------------------------------------------------------------------
 export function openAddModal() {
   const modal = createModal('add', 'Añadir nuevo curso', 'plus');
-  modal.querySelector('.modal__body').innerHTML = courseFormHTML(null);
+  modal.querySelector('.modal__body').innerHTML = courseFormHTML(null, 'add');
   modal.querySelector('.modal__footer').innerHTML = `
     <button class="btn btn--ghost" data-close>Cancelar</button>
     <button class="btn btn--primary" id="add-submit">${icon('check', 15)} <span>Guardar curso</span></button>`;
@@ -27,7 +27,7 @@ export function openAddModal() {
 
 async function submitAdd(modal) {
   const form = modal.querySelector('#course-form');
-  const data = readForm(form);
+  const data = readForm(form, 'add');
   const v = validate(data);
   if (!v.ok) { showToast(v.message, 'error'); markErrors(form, v.fields); return; }
   const btn = modal.querySelector('#add-submit');
@@ -78,7 +78,7 @@ export async function openEditModal(id) {
   bindClose(modal);
   try {
     const course = await getCourse(id);
-    modal.querySelector('.modal__body').innerHTML = courseFormHTML(course);
+    modal.querySelector('.modal__body').innerHTML = courseFormHTML(course, 'edit');
     bindRange(modal);
     modal.querySelector('#edit-submit').addEventListener('click', () => submitEdit(modal, id));
   } catch (err) {
@@ -89,7 +89,7 @@ export async function openEditModal(id) {
 
 async function submitEdit(modal, id) {
   const form = modal.querySelector('#course-form');
-  const data = readForm(form);
+  const data = readForm(form, 'edit');
   const v = validate(data);
   if (!v.ok) { showToast(v.message, 'error'); markErrors(form, v.fields); return; }
   const btn = modal.querySelector('#edit-submit');
@@ -167,8 +167,9 @@ function bindRange(modal) {
   if (range && out) range.addEventListener('input', () => (out.textContent = `${range.value}%`));
 }
 
-function courseFormHTML(course) {
+function courseFormHTML(course, mode = 'edit') {
   const c = course || {};
+  const isAdd = mode === 'add';
   return `
     <form id="course-form" novalidate>
       <div class="form-grid">
@@ -181,12 +182,13 @@ function courseFormHTML(course) {
           <label class="field__label" for="course-description">Descripción</label>
           <textarea id="course-description" name="description" placeholder="Breve descripción del contenido" maxlength="500">${escapeHtml(c.description || '')}</textarea>
         </div>
+        ${isAdd ? '' : `
         <div class="field">
           <label class="field__label" for="course-status">Estado</label>
           <select id="course-status" name="status">
             ${statusOptions().map((o) => `<option value="${o.value}" ${o.value === c.status ? 'selected' : ''}>${o.label}</option>`).join('')}
           </select>
-        </div>
+        </div>`}
         <div class="field">
           <label class="field__label" for="course-priority">Prioridad</label>
           <select id="course-priority" name="priority">
@@ -197,10 +199,11 @@ function courseFormHTML(course) {
           <label class="field__label" for="course-targetDate">Fecha objetivo</label>
           <input type="date" id="course-targetDate" name="targetDate" value="${c.targetDate || ''}" />
         </div>
+        ${isAdd ? '' : `
         <div class="field">
           <label class="field__label">Progreso: <span id="progress-value" class="range-value">${c.progress ?? 0}%</span></label>
           <div class="range-row"><input type="range" id="course-progress" name="progress" min="0" max="100" step="5" value="${c.progress ?? 0}" /></div>
-        </div>
+        </div>`}
       </div>
     </form>`;
 }
@@ -222,20 +225,23 @@ function errDetail(msg) {
   return `<div class="empty-state"><div class="empty-state__icon">${icon('close', 26)}</div><h3>No se pudo cargar</h3><p>${escapeHtml(msg || 'Intenta de nuevo.')}</p></div>`;
 }
 
-function readForm(form) {
-  return {
+function readForm(form, mode = 'edit') {
+  const data = {
     name: form.name.value.trim(),
     description: form.description.value.trim(),
-    status: form.status.value,
     priority: form.priority.value,
     targetDate: form.targetDate.value || null,
-    progress: parseInt(form.progress.value, 10) || 0,
   };
+  if (mode !== 'add') {
+    data.status = form.status.value;
+    data.progress = parseInt(form.progress.value, 10) || 0;
+  }
+  return data;
 }
 
 function validate(data) {
   if (!data.name) return { ok: false, message: 'El nombre del curso es obligatorio.', fields: ['name'] };
-  if (data.progress < 0 || data.progress > 100) return { ok: false, message: 'El progreso debe estar entre 0 y 100.', fields: ['progress'] };
+  if (data.progress != null && (data.progress < 0 || data.progress > 100)) return { ok: false, message: 'El progreso debe estar entre 0 y 100.', fields: ['progress'] };
   return { ok: true };
 }
 
