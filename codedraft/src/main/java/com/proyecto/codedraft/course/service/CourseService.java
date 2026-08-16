@@ -171,8 +171,8 @@ public class CourseService {
         return course;
     }
 
-    //actualiza múltiples campos de un curso (name, description, status, priority, progress, targetDate)
-    public Course updateCourse(String id, String name, String description, String status, String priority, Integer progress, LocalDate targetDate) {
+    //actualiza múltiples campos de un curso (name, description, priority, targetDate)
+    public Course updateCourse(String id, String name, String description, String priority, LocalDate targetDate) {
         if (id == null || id.trim().isEmpty()) {
             throw new IllegalArgumentException("El ID del curso es obligatorio");
         }
@@ -201,21 +201,10 @@ public class CourseService {
             course.setDescription(description);
         }
 
-        // Actualizar status si se proporciona
-        if (StringUtils.hasText(status)) {
-            CourseStatus newStatus = parseStatus(status);
-            course.setStatus(newStatus);
-        }
-
         // Actualizar priority si se proporciona
         if (StringUtils.hasText(priority)) {
             CoursePriority newPriority = parsePriority(priority);
             course.setPriority(newPriority);
-        }
-
-        // Actualizar progress si se proporciona
-        if (progress != null) {
-            course.setProgress(progress);
         }
 
         // Actualizar targetDate si se proporciona
@@ -225,9 +214,6 @@ public class CourseService {
             }
             course.setTargetDate(targetDate);
         }
-
-        // Validar consistencia entre status y progress después de las actualizaciones
-        validateStatusProgressConsistency(course.getStatus(), course.getProgress());
 
         courseRepository.saveAll(courses);
         return course;
