@@ -4,6 +4,7 @@
 import { getState, setLoading } from '../state/store.js';
 import { getSuggestedCourses } from '../services/api.js';
 import { icon, showToast, escapeHtml, spinnerHTML, progressRing } from '../utils/ui.js';
+import { openAddSuggestedModal } from './courseModals.js';
 
 export async function renderSuggested(root) {
   root.innerHTML = `
@@ -22,7 +23,8 @@ export async function renderSuggested(root) {
     content.innerHTML = suggestedHTML(suggested, getState().profile);
     content.querySelectorAll('[data-add-suggested]').forEach((btn) =>
       btn.addEventListener('click', () => {
-        showToast(`"${btn.dataset.name}" está listo para añadirse cuando lo conectes a tus cursos.`, 'info');
+        const course = suggested[Number(btn.dataset.addSuggested)];
+        if (course) openAddSuggestedModal(course);
       })
     );
   } catch (err) {
@@ -48,13 +50,13 @@ function suggestedHTML(suggested, profile) {
     </div></div>` : ''}
 
     <div class="catalog-grid">
-      ${featuredCardHTML(top, maxScore)}
-      ${rest.map((c) => cardHTML(c, maxScore)).join('')}
+      ${featuredCardHTML(top, maxScore, 0)}
+      ${rest.map((c, i) => cardHTML(c, maxScore, i + 1)).join('')}
     </div>
   `;
 }
 
-function featuredCardHTML(course, maxScore) {
+function featuredCardHTML(course, maxScore, idx) {
   const score = course?.score ?? 0;
   const matchPct = score > 0 ? Math.round((score / (maxScore || 1)) * 100) : 0;
   return `
@@ -68,7 +70,7 @@ function featuredCardHTML(course, maxScore) {
         </div>
         <div class="catalog-card__roles" style="margin-bottom:var(--s-4)">Para: ${(course.roles || []).slice(0, 3).map(escapeHtml).join(' · ')}</div>
         <div style="margin-top:auto">
-          <button class="btn btn--primary" data-add-suggested data-name="${escapeHtml(course.name)}">${icon('plus', 15)} Añadir a mis cursos</button>
+          <button class="btn btn--primary" data-add-suggested="${idx}">${icon('plus', 15)} Añadir a mis cursos</button>
         </div>
       </div>
       <div class="catalog-card__visual">
@@ -79,14 +81,14 @@ function featuredCardHTML(course, maxScore) {
   `;
 }
 
-function cardHTML(course, maxScore) {
+function cardHTML(course, maxScore, idx) {
   const score = course.score ?? 0;
   const matchPct = score > 0 ? Math.round((score / (maxScore || 1)) * 100) : 0;
   const isStrong = score > 0 && score >= maxScore * 0.6;
   return `
     <article class="catalog-card">
       ${score > 0 ? `<span class="catalog-card__match ${isStrong ? 'is-strong' : ''}">${matchPct}% match</span>` : ''}
-      <button class="catalog-card__add" data-add-suggested data-name="${escapeHtml(course.name)}" title="Añadir">${icon('plus', 14)}</button>
+      <button class="catalog-card__add" data-add-suggested="${idx}" title="Añadir">${icon('plus', 14)}</button>
       <h3 class="catalog-card__name">${escapeHtml(course.name)}</h3>
       <p class="catalog-card__desc">${escapeHtml(course.description || '')}</p>
       <div class="catalog-card__tags">
@@ -94,7 +96,7 @@ function cardHTML(course, maxScore) {
       </div>
       <div class="catalog-card__roles">Para: ${(course.roles || []).slice(0, 3).map(escapeHtml).join(', ')}</div>
       <div class="catalog-card__cta">
-        <button class="btn btn--secondary btn--block btn--sm" data-add-suggested data-name="${escapeHtml(course.name)}">${icon('plus', 14)} Añadir a mis cursos</button>
+        <button class="btn btn--secondary btn--block btn--sm" data-add-suggested="${idx}">${icon('plus', 14)} Añadir a mis cursos</button>
       </div>
     </article>
   `;

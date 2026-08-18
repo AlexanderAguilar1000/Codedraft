@@ -562,6 +562,14 @@ select {
 }
 select option { background: var(--bg-card-alt); }
 
+input[readonly],textarea[readonly] {
+  background: var(--bg-card-alt);
+  color: var(--text-muted);
+  border-style: dashed;
+  cursor: not-allowed;
+}
+input[readonly]:focus,textarea[readonly]:focus { box-shadow: none; border-color: var(--border-mid); }
+
 /* Interest chip picker */
 .chip-picker { display: flex; flex-wrap: wrap; gap: var(--s-2); }
 .chip-option {

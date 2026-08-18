@@ -45,6 +45,42 @@ async function submitAdd(modal) {
   } finally { setLoading('saving', false); }
 }
 
+// ADD FROM SUGGESTED ---------------------------------------------------------
+export function openAddSuggestedModal(course) {
+  const modal = createModal('add-suggested', 'Añadir curso sugerido', 'plus');
+  modal.querySelector('.modal__body').innerHTML = suggestedFormHTML(course);
+  modal.querySelector('.modal__footer').innerHTML = `
+    <button class="btn btn--ghost" data-close>Cancelar</button>
+    <button class="btn btn--primary" id="add-suggested-submit">${icon('check', 15)} <span>Guardar curso</span></button>`;
+  document.body.appendChild(modal);
+  wireModalClose(modal);
+  bindClose(modal);
+  modal.querySelector('#add-suggested-submit').addEventListener('click', () => submitAddSuggested(modal, course));
+}
+
+async function submitAddSuggested(modal, course) {
+  const form = modal.querySelector('#course-form');
+  const data = readForm(form);
+  // El nombre y la descripción provienen de la sugerencia y no son editables.
+  data.name = course.name;
+  data.description = course.description || '';
+  const v = validate(data);
+  if (!v.ok) { showToast(v.message, 'error'); markErrors(form, v.fields); return; }
+  const btn = modal.querySelector('#add-suggested-submit');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner" style="width:14px;height:14px"></span> <span>Guardando…</span>`;
+  setLoading('saving', true);
+  try {
+    await createCourse(data);
+    showToast('Curso añadido a tu lista.', 'success');
+    modal.remove();
+  } catch (err) {
+    showToast(err.message || 'No se pudo añadir el curso.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = `${icon('check', 15)} <span>Guardar curso</span>`;
+  } finally { setLoading('saving', false); }
+}
+
 // VIEW ----------------------------------------------------------------------
 export async function openViewModal(id) {
   const modal = createModal('view', 'Detalle del curso', 'eye', 'modal--lg');
@@ -182,6 +218,33 @@ function courseFormHTML(course) {
         <div class="field">
           <label class="field__label" for="course-targetDate">Fecha objetivo</label>
           <input type="date" id="course-targetDate" name="targetDate" value="${c.targetDate || ''}" />
+        </div>
+      </div>
+    </form>`;
+}
+
+function suggestedFormHTML(course) {
+  const c = course || {};
+  return `
+    <form id="course-form" novalidate>
+      <div class="form-grid">
+        <div class="field full">
+          <label class="field__label" for="course-name">Nombre del curso</label>
+          <input type="text" id="course-name" name="name" value="${escapeHtml(c.name || '')}" readonly tabindex="-1" />
+        </div>
+        <div class="field full">
+          <label class="field__label" for="course-description">Descripción</label>
+          <textarea id="course-description" name="description" readonly tabindex="-1">${escapeHtml(c.description || '')}</textarea>
+        </div>
+        <div class="field">
+          <label class="field__label" for="course-priority">Prioridad</label>
+          <select id="course-priority" name="priority">
+            ${priorityOptions().map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="course-targetDate">Fecha objetivo</label>
+          <input type="date" id="course-targetDate" name="targetDate" />
         </div>
       </div>
     </form>`;
