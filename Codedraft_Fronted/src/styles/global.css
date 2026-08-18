@@ -464,8 +464,11 @@ body::after {
   flex-shrink: 0;
 }
 .action-btn:hover { background: var(--bg-elevated); color: var(--text); }
+.action-btn--view        { color: var(--info); }
 .action-btn--view:hover  { color: var(--info); background: var(--info-bg); }
+.action-btn--edit        { color: var(--teal); }
 .action-btn--edit:hover  { color: var(--teal); background: var(--teal-subtle); }
+.action-btn--delete        { color: var(--danger); }
 .action-btn--delete:hover{ color: var(--danger); background: var(--danger-bg); }
 .action-btn svg { width: 15px; height: 15px; }
 

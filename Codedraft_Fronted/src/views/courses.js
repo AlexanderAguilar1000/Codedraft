@@ -1,12 +1,11 @@
 // CodeCraftHub — Course Management view.
 // Endpoints: GET /api/courses, GET /api/courses/stats, GET /api/courses/search,
-// PATCH /api/courses/{id}/status, /priority, /target-date, /progress
+// PATCH /api/courses/{id}/priority, /target-date
 
 import { getState, setState, setLoading } from '../state/store.js';
 import {
   getCourses, getCourseStats, searchCourses,
-  updateCourseStatus, updateCoursePriority, updateCourseTargetDate, updateCourseProgress,
-  getExperiencePoints,
+  updateCoursePriority, updateCourseTargetDate,
 } from '../services/api.js';
 import {
   icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel,
@@ -45,8 +44,8 @@ export async function renderCourses(root) {
         </div>
         <div class="table-wrap">
           <table class="data-table" id="courses-table">
-            <thead><tr><th>Curso</th><th>Estado</th><th>Prioridad</th><th>Fecha objetivo</th><th>Progreso</th><th class="col-actions">Acciones</th></tr></thead>
-            <tbody id="courses-tbody">${tableSkeletonHTML(6)}</tbody>
+            <thead><tr><th>Curso</th><th>Prioridad</th><th>Fecha objetivo</th><th>Progreso</th><th class="col-actions">Acciones</th></tr></thead>
+            <tbody id="courses-tbody">${tableSkeletonHTML(5)}</tbody>
           </table>
         </div>
       </div>
@@ -66,7 +65,7 @@ async function loadCourses(root) {
     renderKPIs(root, stats);
     renderTable(root, courses);
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="6">${errBox('No se pudieron cargar los cursos', err.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5">${errBox('No se pudieron cargar los cursos', err.message)}</td></tr>`;
     showToast(err.message || 'Error al cargar los cursos.', 'error');
   } finally {
     setLoading('courses', false);
@@ -100,7 +99,7 @@ function renderTable(root, courses) {
 
   if (!courses.length) {
     const hasFilters = f.name || f.status || f.priority;
-    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">
       <div class="empty-state__icon">${icon('book', 26)}</div>
       <h3>${hasFilters ? 'Sin resultados' : 'No hay cursos'}</h3>
       <p>${hasFilters ? 'Ningún curso coincide con los filtros aplicados.' : 'Añade tu primer curso para empezar a gestionar tu aprendizaje.'}</p>
@@ -111,11 +110,9 @@ function renderTable(root, courses) {
   }
 
   tbody.innerHTML = courses.map((c) => rowHTML(c)).join('');
-  // Inline selects + date + progress slider
-  tbody.querySelectorAll('[data-status-select]').forEach(bindStatusSelect);
+  // Inline selects + date
   tbody.querySelectorAll('[data-priority-select]').forEach(bindPrioritySelect);
   tbody.querySelectorAll('[data-date-input]').forEach(bindDateInput);
-  tbody.querySelectorAll('[data-progress-slider]').forEach(bindProgressSlider);
   // Action buttons
   tbody.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => openViewModal(b.dataset.view)));
   tbody.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => openEditModal(b.dataset.edit)));
@@ -128,9 +125,6 @@ function renderTable(root, courses) {
 function rowHTML(c) {
   return `<tr data-course-id="${c.id}">
     <td><div class="col-name">${escapeHtml(c.name)}</div><div class="col-desc">${escapeHtml(c.description || 'Sin descripción')}</div></td>
-    <td><select class="inline-select" data-status-select="${c.id}" data-original="${c.status}">
-      ${statusOptions().map((o) => `<option value="${o.value}" ${o.value === c.status ? 'selected' : ''}>${o.label}</option>`).join('')}
-    </select></td>
     <td><select class="inline-select" data-priority-select="${c.id}" data-original="${c.priority}">
       ${priorityOptions().map((o) => `<option value="${o.value}" ${o.value === c.priority ? 'selected' : ''}>${o.label}</option>`).join('')}
     </select></td>
@@ -139,7 +133,6 @@ function rowHTML(c) {
       <div class="progress-row">
         <div class="progress"><div class="progress__bar ${c.progress >= 100 ? 'is-complete' : ''}" style="width:${c.progress}%"></div></div>
         <span data-progress-value="${c.id}">${c.progress}%</span>
-        <button class="action-btn" data-progress-slider="${c.id}" title="Ajustar progreso">${icon('trending', 14)}</button>
       </div>
     </td>
     <td class="col-actions">
@@ -148,22 +141,6 @@ function rowHTML(c) {
       <button class="action-btn action-btn--delete" data-delete="${c.id}" title="Eliminar" aria-label="Eliminar">${icon('trash', 15)}</button>
     </td>
   </tr>`;
-}
-
-function bindStatusSelect(sel) {
-  sel.addEventListener('change', async () => {
-    const id = sel.dataset.statusSelect;
-    sel.disabled = true;
-    try {
-      const updated = await updateCourseStatus(id, sel.value);
-      updateRowInState(updated);
-      refreshRow(sel, updated);
-      showToast('Estado actualizado.', 'success');
-    } catch (err) {
-      sel.value = sel.dataset.original;
-      showToast(err.message || 'No se pudo actualizar el estado.', 'error');
-    } finally { sel.disabled = false; }
-  });
 }
 
 function bindPrioritySelect(sel) {
@@ -196,64 +173,6 @@ function bindDateInput(inp) {
   });
 }
 
-function bindProgressSlider(btn) {
-  btn.addEventListener('click', () => {
-    const id = btn.dataset.progressSlider;
-    const course = getState().courses.find((c) => c.id === id);
-    if (course) openProgressModal(course);
-  });
-}
-
-function openProgressModal(course) {
-  const modal = document.createElement('div');
-  modal.className = 'modal-backdrop';
-  modal.id = 'modal-progress';
-  modal.innerHTML = `
-    <div class="modal modal--sm" role="dialog" aria-modal="true">
-      <div class="modal__header"><span class="modal__title">${icon('trending', 18)} Progreso — ${escapeHtml(course.name)}</span>
-        <button class="modal__close" data-close>${icon('close', 16)}</button></div>
-      <div class="modal__body">
-        <div class="field">
-          <label class="field__label">Progreso: <span id="prog-val" class="range-value">${course.progress}%</span></label>
-          <div class="range-row"><input type="range" id="prog-range" min="0" max="100" step="5" value="${course.progress}" /></div>
-          <span class="field__hint">Al llegar a 100% el curso se marca como completado y sumas puntos de experiencia.</span>
-        </div>
-      </div>
-      <div class="modal__footer">
-        <button class="btn btn--ghost" data-close>Cancelar</button>
-        <button class="btn btn--primary" id="prog-save">${icon('check', 15)} Guardar</button>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-  const close = () => modal.remove();
-  modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
-  modal.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));
-  const range = modal.querySelector('#prog-range');
-  const val = modal.querySelector('#prog-val');
-  range.addEventListener('input', () => (val.textContent = `${range.value}%`));
-  modal.querySelector('#prog-save').addEventListener('click', async () => {
-    const saveBtn = modal.querySelector('#prog-save');
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = `<span class="spinner" style="width:14px;height:14px"></span> Guardando…`;
-    try {
-      const updated = await updateCourseProgress(course.id, parseInt(range.value, 10));
-      updateRowInState(updated);
-      // Refresh XP from backend
-      try { const xp = await getExperiencePoints(); setState({ experiencePoints: xp.experiencePoints ?? 0 }); } catch {}
-      showToast(`Progreso actualizado a ${updated.progress}%.`, 'success');
-      if (updated.status === 'COMPLETADO' && course.status !== 'COMPLETADO') {
-        showToast('¡Curso completado! +5 puntos de experiencia.', 'success', 5000);
-      }
-      close();
-      await refreshCourses();
-    } catch (err) {
-      showToast(err.message || 'No se pudo actualizar el progreso.', 'error');
-      saveBtn.disabled = false;
-      saveBtn.innerHTML = `${icon('check', 15)} Guardar`;
-    }
-  });
-}
-
 function updateRowInState(updated) {
   const courses = getState().courses.map((c) => (c.id === updated.id ? updated : c));
   setState({ courses });
@@ -266,9 +185,6 @@ function refreshRow(sel, updated) {
   const val = row.querySelector('[data-progress-value]');
   if (bar) { bar.style.width = `${updated.progress}%`; bar.classList.toggle('is-complete', updated.progress >= 100); }
   if (val) val.textContent = `${updated.progress}%`;
-  // Update status select options to reflect backend change (progress 100 → COMPLETADO)
-  const statusSel = row.querySelector('[data-status-select]');
-  if (statusSel) { statusSel.value = updated.status; statusSel.dataset.original = updated.status; }
 }
 
 function bindToolbar(root) {
@@ -288,7 +204,7 @@ async function applyFilters(root) {
   const priority = root.querySelector('#filter-priority').value;
   setState({ filters: { name, status, priority } });
   const tbody = root.querySelector('#courses-tbody');
-  tbody.innerHTML = tableSkeletonHTML(6);
+  tbody.innerHTML = tableSkeletonHTML(5);
   const filters = {};
   if (name) filters.name = name;
   if (status) filters.status = status;
@@ -297,7 +213,7 @@ async function applyFilters(root) {
     const results = Object.keys(filters).length ? await searchCourses(filters) : await getCourses();
     renderTable(root, results);
   } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="6">${errBox('Error en la búsqueda', err.message)}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5">${errBox('Error en la búsqueda', err.message)}</td></tr>`;
     showToast(err.message || 'Error al filtrar.', 'error');
   }
 }

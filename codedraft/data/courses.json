@@ -1,17 +1,17 @@
 [ {
   "id" : "7d3e7ff2-f087-4a2f-8e91-e49f560cc5d2",
   "name" : "Java 22 Avanzado",
-  "description" : "Curso avanzado de Java con Spring Boot",
+  "description" : "Curso avanzado de Java con Spring Boot y documentacion",
   "status" : "EN_CURSO",
   "priority" : "MEDIA",
   "targetDate" : "2027-05-15",
   "progress" : 45
 }, {
-  "id" : "02271bd1-d9ca-485a-8241-77bc38814fcc",
-  "name" : "Angular y Docker",
-  "description" : "Curso para aprender desarrollo frontend con Angular y despliegue de aplicaciones usando Docker",
+  "id" : "473bb658-78ef-4557-98ec-e14aafd1c587",
+  "name" : "Git Hub",
+  "description" : "Rmas y IA",
   "status" : "NO_INICIADO",
   "priority" : "ALTA",
-  "targetDate" : "2027-06-30",
+  "targetDate" : "2026-10-15",
   "progress" : 0
 } ]
