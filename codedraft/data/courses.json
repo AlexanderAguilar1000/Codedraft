@@ -1,25 +1,17 @@
 [ {
   "id" : "473bb658-78ef-4557-98ec-e14aafd1c587",
   "name" : "Git Hub",
-  "description" : "Rmas y IA",
+  "description" : "Ramas y IA",
   "status" : "NO_INICIADO",
   "priority" : "ALTA",
   "targetDate" : "2026-10-15",
   "progress" : 0
 }, {
-  "id" : "ff12d4b8-557e-47d1-85a0-dc5c540d2a43",
-  "name" : "Machine Learning con TensorFlow",
-  "description" : "Curso práctico de machine learning usando TensorFlow y Python",
+  "id" : "77be6886-aadf-4ed3-aae1-e5cd0e577c22",
+  "name" : "DevOps con CI/CD",
+  "description" : "Implementación de pipelines CI/CD con Jenkins, GitLab y GitHub Actions",
   "status" : "NO_INICIADO",
   "priority" : "MEDIA",
-  "targetDate" : "2026-10-17",
-  "progress" : 0
-}, {
-  "id" : "5588ef0b-0c7e-46c8-9812-d252eb5acbee",
-  "name" : "Cybersecurity Fundamentals",
-  "description" : "Fundamentos de ciberseguridad y ethical hacking",
-  "status" : "NO_INICIADO",
-  "priority" : "ALTA",
-  "targetDate" : "2026-09-17",
+  "targetDate" : "2026-11-22",
   "progress" : 0
 } ]

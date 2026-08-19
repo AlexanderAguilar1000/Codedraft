@@ -2,13 +2,14 @@
 // Endpoints: POST /api/courses, GET /api/courses/{id},
 // PATCH /api/courses/{id}/update, DELETE /api/courses/{id}
 
-import { createCourse, updateCourse, deleteCourse, getCourse } from '../services/api.js';
+import { createCourse, updateCourse, deleteCourse, getCourse, removeSuggestedCourse } from '../services/api.js';
 import { getState, setLoading } from '../state/store.js';
 import {
   icon, showToast, escapeHtml, wireModalClose,
   formatDate, statusLabel, priorityLabel, priorityOptions,
 } from '../utils/ui.js';
 import { refreshCourses } from './courses.js';
+import { navigate } from '../router.js';
 
 // ADD -----------------------------------------------------------------------
 export function openAddModal() {
@@ -72,8 +73,14 @@ async function submitAddSuggested(modal, course) {
   setLoading('saving', true);
   try {
     await createCourse(data);
+    try {
+      await removeSuggestedCourse(course.id);
+    } catch (err) {
+      showToast(err.message || 'El curso se añadió, pero no se pudo quitar de las sugerencias.', 'error');
+    }
     showToast('Curso añadido a tu lista.', 'success');
     modal.remove();
+    navigate('courses');
   } catch (err) {
     showToast(err.message || 'No se pudo añadir el curso.', 'error');
     btn.disabled = false;

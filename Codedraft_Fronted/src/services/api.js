@@ -172,3 +172,11 @@ export async function getSuggestedCourses() {
   if (!res.ok) throw await parseError(res);
   return res.json();
 }
+
+// DELETE /api/catalogo/suggested/{courseId}
+export async function removeSuggestedCourse(courseId) {
+  const res = await fetch(`${API_BASE}/api/catalogo/suggested/${courseId}`, { method: 'DELETE' });
+  if (!res.ok) throw await parseError(res);
+  if (res.status === 204) return { message: 'Curso eliminado del catálogo de sugerencias.' };
+  return res.json().catch(() => ({ message: 'Curso eliminado del catálogo de sugerencias.' }));
+}
