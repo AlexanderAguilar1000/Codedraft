@@ -152,8 +152,7 @@ public class CatalogService {
     }
 
     /**
-     * Obtiene una lista simplificada con solo los nombres de los cursos sugeridos.
-     * Utilizado para el selector de cursos al momento de crear un nuevo curso.
+     * Obtiene los datos necesarios para el selector de cursos.
      */
     public List<CourseNameResponse> getSuggestedCourseNames() {
         List<CatalogCourse> catalog = catalogRepository.findAll();
@@ -164,7 +163,10 @@ public class CatalogService {
 
         return catalog.stream()
                 .filter(course -> course != null && course.getName() != null)
-                .map(course -> new CourseNameResponse(course.getName()))
+            .map(course -> new CourseNameResponse(
+                course.getId(),
+                course.getName(),
+                course.getDescription()))
                 .toList();
     }
 }

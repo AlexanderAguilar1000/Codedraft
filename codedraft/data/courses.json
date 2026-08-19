@@ -3,7 +3,7 @@
   "name" : "Git Hub",
   "description" : "Ramas y IA",
   "status" : "NO_INICIADO",
-  "priority" : "ALTA",
+  "priority" : "MEDIA",
   "targetDate" : "2026-10-15",
   "progress" : 0
 }, {
@@ -13,5 +13,13 @@
   "status" : "NO_INICIADO",
   "priority" : "MEDIA",
   "targetDate" : "2026-11-22",
+  "progress" : 0
+}, {
+  "id" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
+  "name" : "React Native",
+  "description" : "Desarrollo de aplicaciones móviles con React Native",
+  "status" : "NO_INICIADO",
+  "priority" : "ALTA",
+  "targetDate" : "2026-09-05",
   "progress" : 0
 } ]

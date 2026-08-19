@@ -1,8 +1,10 @@
 // CodeCraftHub — Course modals (add, view, edit, delete).
-// Endpoints: POST /api/courses, GET /api/courses/{id},
+// Endpoints: POST /api/courses, GET /api/courses/{id}, GET /api/catalogo/suggested/names,
 // PATCH /api/courses/{id}/update, DELETE /api/courses/{id}
 
-import { createCourse, updateCourse, deleteCourse, getCourse, removeSuggestedCourse } from '../services/api.js';
+import {
+  createCourse, updateCourse, deleteCourse, getCourse, removeSuggestedCourse, getSuggestedCourseNames,
+} from '../services/api.js';
 import { getState, setLoading } from '../state/store.js';
 import {
   icon, showToast, escapeHtml, wireModalClose,
@@ -12,22 +14,52 @@ import { refreshCourses } from './courses.js';
 import { navigate } from '../router.js';
 
 // ADD -----------------------------------------------------------------------
-export function openAddModal() {
+export async function openAddModal() {
   const modal = createModal('add', 'Añadir nuevo curso', 'plus');
-  modal.querySelector('.modal__body').innerHTML = courseFormHTML(null);
+  modal.querySelector('.modal__body').innerHTML = `<div class="loading-overlay"><span class="spinner" style="width:22px;height:22px"></span></div>`;
   modal.querySelector('.modal__footer').innerHTML = `
     <button class="btn btn--ghost" data-close>Cancelar</button>
-    <button class="btn btn--primary" id="add-submit">${icon('check', 15)} <span>Guardar curso</span></button>`;
+    <button class="btn btn--primary" id="add-submit" disabled>${icon('check', 15)} <span>Guardar curso</span></button>`;
   document.body.appendChild(modal);
   wireModalClose(modal);
   bindClose(modal);
-  modal.querySelector('#add-submit').addEventListener('click', () => submitAdd(modal));
-  modal.querySelector('#course-name').focus();
+  try {
+    const suggested = await getSuggestedCourseNames();
+    if (!suggested.length) {
+      modal.querySelector('.modal__body').innerHTML = errDetail('No hay cursos sugeridos disponibles por el momento.');
+      return;
+    }
+    modal.querySelector('.modal__body').innerHTML = addCourseFormHTML(suggested);
+    bindSuggestedNameSelect(modal, suggested);
+    const submitBtn = modal.querySelector('#add-submit');
+    submitBtn.disabled = false;
+    submitBtn.addEventListener('click', () => submitAdd(modal, suggested));
+    modal.querySelector('#course-name').focus();
+  } catch (err) {
+    modal.querySelector('.modal__body').innerHTML = errDetail(err.message);
+    showToast(err.message || 'No se pudieron cargar los cursos sugeridos.', 'error');
+  }
 }
 
-async function submitAdd(modal) {
+function bindSuggestedNameSelect(modal, suggested) {
+  const sel = modal.querySelector('#course-name');
+  const desc = modal.querySelector('#course-description');
+  sel.addEventListener('change', () => {
+    const course = suggested.find((c) => String(c.id) === sel.value);
+    desc.value = course?.description || '';
+    sel.closest('.field')?.classList.remove('has-error');
+  });
+}
+
+async function submitAdd(modal, suggested) {
   const form = modal.querySelector('#course-form');
-  const data = readForm(form);
+  const course = suggested.find((c) => String(c.id) === form.name.value);
+  const data = {
+    name: course?.name || '',
+    description: course?.description || '',
+    priority: form.priority.value,
+    targetDate: form.targetDate.value || null,
+  };
   const v = validate(data);
   if (!v.ok) { showToast(v.message, 'error'); markErrors(form, v.fields); return; }
   const btn = modal.querySelector('#add-submit');
@@ -202,19 +234,20 @@ function bindClose(modal) {
   modal.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => modal.remove()));
 }
 
+// Used by the Edit modal: name and description come from the catalog and are read-only there;
+// only priority and target date can be modified once a course has been added.
 function courseFormHTML(course) {
   const c = course || {};
   return `
     <form id="course-form" novalidate>
       <div class="form-grid">
         <div class="field full">
-          <label class="field__label" for="course-name">Nombre del curso<span class="req">*</span></label>
-          <input type="text" id="course-name" name="name" value="${escapeHtml(c.name || '')}" placeholder="Ej. Spring Boot desde cero" required maxlength="120" />
-          <span class="field__error">El nombre es obligatorio.</span>
+          <label class="field__label" for="course-name">Nombre del curso</label>
+          <input type="text" id="course-name" name="name" value="${escapeHtml(c.name || '')}" readonly tabindex="-1" />
         </div>
         <div class="field full">
           <label class="field__label" for="course-description">Descripción</label>
-          <textarea id="course-description" name="description" placeholder="Breve descripción del contenido" maxlength="500">${escapeHtml(c.description || '')}</textarea>
+          <textarea id="course-description" name="description" readonly tabindex="-1">${escapeHtml(c.description || '')}</textarea>
         </div>
         <div class="field">
           <label class="field__label" for="course-priority">Prioridad</label>
@@ -225,6 +258,38 @@ function courseFormHTML(course) {
         <div class="field">
           <label class="field__label" for="course-targetDate">Fecha objetivo</label>
           <input type="date" id="course-targetDate" name="targetDate" value="${c.targetDate || ''}" />
+        </div>
+      </div>
+    </form>`;
+}
+
+// Used by the Add modal: name is picked from the suggested-courses catalog (combobox),
+// description is filled in automatically from the selection and is read-only.
+function addCourseFormHTML(suggested) {
+  return `
+    <form id="course-form" novalidate>
+      <div class="form-grid">
+        <div class="field full">
+          <label class="field__label" for="course-name">Nombre del curso<span class="req">*</span></label>
+          <select id="course-name" name="name" required>
+            <option value="" disabled selected>Selecciona un curso…</option>
+            ${suggested.map((c) => `<option value="${escapeHtml(String(c.id))}">${escapeHtml(c.name)}</option>`).join('')}
+          </select>
+          <span class="field__error">Selecciona un curso.</span>
+        </div>
+        <div class="field full">
+          <label class="field__label" for="course-description">Descripción</label>
+          <textarea id="course-description" name="description" readonly tabindex="-1" placeholder="Se completa automáticamente al elegir un curso"></textarea>
+        </div>
+        <div class="field">
+          <label class="field__label" for="course-priority">Prioridad</label>
+          <select id="course-priority" name="priority">
+            ${priorityOptions().map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="course-targetDate">Fecha objetivo</label>
+          <input type="date" id="course-targetDate" name="targetDate" />
         </div>
       </div>
     </form>`;
@@ -284,7 +349,7 @@ function readForm(form) {
 }
 
 function validate(data) {
-  if (!data.name) return { ok: false, message: 'El nombre del curso es obligatorio.', fields: ['name'] };
+  if (!data.name) return { ok: false, message: 'Selecciona un curso de la lista.', fields: ['name'] };
   return { ok: true };
 }
 

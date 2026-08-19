@@ -173,6 +173,13 @@ export async function getSuggestedCourses() {
   return res.json();
 }
 
+// GET /api/catalogo/suggested/names
+export async function getSuggestedCourseNames() {
+  const res = await fetch(`${API_BASE}/api/catalogo/suggested/names`);
+  if (!res.ok) throw await parseError(res);
+  return res.json();
+}
+
 // DELETE /api/catalogo/suggested/{courseId}
 export async function removeSuggestedCourse(courseId) {
   const res = await fetch(`${API_BASE}/api/catalogo/suggested/${courseId}`, { method: 'DELETE' });

@@ -1,12 +1,13 @@
 package com.proyecto.codedraft.catalogo.dto;
 
 /**
- * DTO simplificado para mostrar solo el nombre de un curso sugerido.
- * Utilizado en el selector de cursos al momento de crear un nuevo curso.
+ * Datos del curso sugerido utilizados por el selector al crear un curso.
  */
 public class CourseNameResponse {
 
+    private String id;
     private String name;
+    private String description;
 
     public CourseNameResponse() {
     }
@@ -15,11 +16,33 @@ public class CourseNameResponse {
         this.name = name;
     }
 
+    public CourseNameResponse(String id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
