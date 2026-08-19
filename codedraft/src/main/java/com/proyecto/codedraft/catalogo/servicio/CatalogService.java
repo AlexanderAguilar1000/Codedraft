@@ -2,6 +2,8 @@ package com.proyecto.codedraft.course.service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import com.proyecto.codedraft.course.dto.SuggestedCourseRequest;
 import com.proyecto.codedraft.course.dto.SuggestedCourseResponse;
 import com.proyecto.codedraft.course.model.CatalogCourse;
 import com.proyecto.codedraft.course.repositorio.CatalogRepository;
+import com.proyecto.codedraft.course.repositorio.CourseRepository;
 import com.proyecto.codedraft.profile.model.Profile;
 import com.proyecto.codedraft.profile.service.ProfileService;
 
@@ -34,10 +37,13 @@ public class CatalogService {
 
     private final CatalogRepository catalogRepository;
     private final ProfileService profileService;
+    private final CourseRepository courseRepository;
 
-    public CatalogService(CatalogRepository catalogRepository, ProfileService profileService) {
+    public CatalogService(CatalogRepository catalogRepository, ProfileService profileService,
+                           CourseRepository courseRepository) {
         this.catalogRepository = catalogRepository;
         this.profileService = profileService;
+        this.courseRepository = courseRepository;
     }
 
     /**
@@ -152,7 +158,8 @@ public class CatalogService {
     }
 
     /**
-     * Obtiene los datos necesarios para el selector de cursos.
+     * Obtiene los datos necesarios para el selector de cursos, excluyendo
+     * los cursos sugeridos que ya fueron registrados por el usuario.
      */
     public List<CourseNameResponse> getSuggestedCourseNames() {
         List<CatalogCourse> catalog = catalogRepository.findAll();
@@ -161,8 +168,14 @@ public class CatalogService {
             throw new IllegalStateException("Error al obtener el catálogo de cursos");
         }
 
+        Set<String> registeredCourseNames = courseRepository.findAll().stream()
+                .filter(course -> course != null && course.getName() != null)
+                .map(course -> course.getName().toLowerCase())
+                .collect(Collectors.toSet());
+
         return catalog.stream()
                 .filter(course -> course != null && course.getName() != null)
+                .filter(course -> !registeredCourseNames.contains(course.getName().toLowerCase()))
             .map(course -> new CourseNameResponse(
                 course.getId(),
                 course.getName(),

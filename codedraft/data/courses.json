@@ -1,25 +1,25 @@
 [ {
-  "id" : "473bb658-78ef-4557-98ec-e14aafd1c587",
-  "name" : "Git Hub",
-  "description" : "Ramas y IA",
-  "status" : "NO_INICIADO",
-  "priority" : "MEDIA",
-  "targetDate" : "2026-10-15",
-  "progress" : 0
-}, {
-  "id" : "77be6886-aadf-4ed3-aae1-e5cd0e577c22",
-  "name" : "DevOps con CI/CD",
-  "description" : "Implementación de pipelines CI/CD con Jenkins, GitLab y GitHub Actions",
-  "status" : "NO_INICIADO",
-  "priority" : "MEDIA",
-  "targetDate" : "2026-11-22",
-  "progress" : 0
-}, {
   "id" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
   "name" : "React Native",
   "description" : "Desarrollo de aplicaciones móviles con React Native",
   "status" : "NO_INICIADO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-05",
+  "progress" : 0
+}, {
+  "id" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
+  "name" : "Python para Data Science",
+  "description" : "Curso completo de Python enfocado en análisis de datos y machine learning",
+  "status" : "NO_INICIADO",
+  "priority" : "ALTA",
+  "targetDate" : "2026-09-20",
+  "progress" : 0
+}, {
+  "id" : "4e2af9e0-b721-4b6e-a601-8626f3439378",
+  "name" : "Cybersecurity Fundamentals",
+  "description" : "Fundamentos de ciberseguridad y ethical hacking",
+  "status" : "NO_INICIADO",
+  "priority" : "ALTA",
+  "targetDate" : "2026-09-20",
   "progress" : 0
 } ]
