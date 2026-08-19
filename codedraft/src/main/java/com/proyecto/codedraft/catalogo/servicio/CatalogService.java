@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.proyecto.codedraft.course.dto.SuggestedCourseRequest;
 import com.proyecto.codedraft.course.dto.SuggestedCourseResponse;
 import com.proyecto.codedraft.course.model.CatalogCourse;
 import com.proyecto.codedraft.course.repositorio.CatalogRepository;
@@ -76,6 +77,37 @@ public class CatalogService {
                     .sorted(Comparator.comparing(SuggestedCourseResponse::getName, String.CASE_INSENSITIVE_ORDER))
                     .toList();
         }
+    }
+
+    /**
+     * Elimina un curso del catálogo por su ID.
+     */
+    public void removeSuggestedCourse(String courseId) {
+        catalogRepository.deleteById(courseId);
+    }
+
+    /**
+     * Agrega un nuevo curso al catálogo de cursos sugeridos.
+     */
+    public void addSuggestedCourse(SuggestedCourseRequest request) {
+        request.validateNoNullElements();
+        
+        List<CatalogCourse> existingCourses = catalogRepository.findAll();
+        boolean idExists = existingCourses.stream()
+                .anyMatch(course -> course.getId().equals(request.getId()));
+        
+        if (idExists) {
+            throw new IllegalArgumentException("Ya existe un curso con el ID: " + request.getId());
+        }
+        
+        CatalogCourse course = new CatalogCourse();
+        course.setId(request.getId());
+        course.setName(request.getName());
+        course.setDescription(request.getDescription());
+        course.setRoles(request.getRoles());
+        course.setCareers(request.getCareers());
+        course.setTags(request.getTags());
+        catalogRepository.save(course);
     }
 
     /**

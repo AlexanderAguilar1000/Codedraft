@@ -39,4 +39,33 @@ public class CatalogRepository {
             return new ArrayList<>(courses);
         }
     }
+
+    public void deleteById(String courseId) {
+        synchronized (lock) {
+            if (!catalogFile.exists()) {
+                throw new IllegalStateException("El archivo de catálogo no existe");
+            }
+            List<CatalogCourse> courses = objectMapper.readValue(catalogFile, new TypeReference<List<CatalogCourse>>() {
+            });
+            boolean removed = courses.removeIf(course -> course.getId().equals(courseId));
+            if (!removed) {
+                throw new IllegalArgumentException("Curso con ID " + courseId + " no encontrado");
+            }
+            objectMapper.writeValue(catalogFile, courses);
+        }
+    }
+
+    public void save(CatalogCourse course) {
+        synchronized (lock) {
+            List<CatalogCourse> courses;
+            if (!catalogFile.exists()) {
+                courses = new ArrayList<>();
+            } else {
+                courses = objectMapper.readValue(catalogFile, new TypeReference<List<CatalogCourse>>() {
+                });
+            }
+            courses.add(course);
+            objectMapper.writeValue(catalogFile, courses);
+        }
+    }
 }
