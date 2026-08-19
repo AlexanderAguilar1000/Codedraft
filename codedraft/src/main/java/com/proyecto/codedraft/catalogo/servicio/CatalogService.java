@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.proyecto.codedraft.catalogo.dto.CourseNameResponse;
 import com.proyecto.codedraft.course.dto.SuggestedCourseRequest;
 import com.proyecto.codedraft.course.dto.SuggestedCourseResponse;
 import com.proyecto.codedraft.course.model.CatalogCourse;
@@ -148,5 +149,22 @@ public class CatalogService {
         }
 
         return score;
+    }
+
+    /**
+     * Obtiene una lista simplificada con solo los nombres de los cursos sugeridos.
+     * Utilizado para el selector de cursos al momento de crear un nuevo curso.
+     */
+    public List<CourseNameResponse> getSuggestedCourseNames() {
+        List<CatalogCourse> catalog = catalogRepository.findAll();
+
+        if (catalog == null) {
+            throw new IllegalStateException("Error al obtener el catálogo de cursos");
+        }
+
+        return catalog.stream()
+                .filter(course -> course != null && course.getName() != null)
+                .map(course -> new CourseNameResponse(course.getName()))
+                .toList();
     }
 }

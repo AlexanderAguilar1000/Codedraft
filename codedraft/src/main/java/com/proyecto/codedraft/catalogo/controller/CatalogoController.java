@@ -1,5 +1,6 @@
 package com.proyecto.codedraft.catalogo.controller;
 
+import com.proyecto.codedraft.catalogo.dto.CourseNameResponse;
 import com.proyecto.codedraft.course.dto.SuggestedCourseRequest;
 import com.proyecto.codedraft.course.dto.SuggestedCourseResponse;
 import com.proyecto.codedraft.course.service.CatalogService;
@@ -63,6 +64,13 @@ public class CatalogoController {
                 0
         );
         return ResponseEntity.ok(response);
+    }
+
+    //obtiene solo los nombres de los cursos sugeridos para el selector al crear un curso
+    @GetMapping("/suggested/names")
+    public ResponseEntity<List<CourseNameResponse>> getSuggestedCourseNames() {
+        List<CourseNameResponse> names = catalogService.getSuggestedCourseNames();
+        return ResponseEntity.ok(names);
     }
 
 
