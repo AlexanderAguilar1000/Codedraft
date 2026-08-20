@@ -7,18 +7,13 @@ import {
   getExperiencePoints, getCourseStats, getRecommendedCourse,
   getCourses, getSuggestedCourses,
 } from '../services/api.js';
-import { icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel, spinnerHTML } from '../utils/ui.js';
+import { icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel, spinnerHTML, pageHeader, emptyBox, errBox } from '../utils/ui.js';
 import { computeLevel, getStudyStreak } from '../utils/gamification.js';
 import { navigate } from '../router.js';
 
 export async function renderDashboard(root) {
   root.innerHTML = `
-    <div class="page-head">
-      <div class="page-head__left">
-        <h1>${icon('dashboard', 22, 'page-icon')} Dashboard</h1>
-        <p class="page-head__subtitle">Tu progreso de aprendizaje de un vistazo.</p>
-      </div>
-    </div>
+    ${pageHeader({ icon: 'dashboard', title: 'Dashboard', subtitle: 'Tu progreso de aprendizaje de un vistazo.' })}
     <div id="dash-content"><div class="loading-overlay">${spinnerHTML(26, 'Cargando tu dashboard…')}</div></div>
   `;
 
@@ -134,13 +129,6 @@ function kpi(label, value, ic, tone) {
 }
 
 function priorityBadgeClass(p) { return { ALTA: 'badge--high', MEDIA: 'badge--medium', BAJA: 'badge--low' }[p] || 'badge--neutral'; }
-
-function emptyBox(ic, title, desc) {
-  return `<div class="empty-state" style="padding:var(--s-8)"><div class="empty-state__icon">${icon(ic, 26)}</div><h3>${title}</h3><p>${desc}</p></div>`;
-}
-function errBox(title, msg) {
-  return `<div class="empty-state"><div class="empty-state__icon">${icon('close', 26)}</div><h3>${title}</h3><p>${escapeHtml(msg || 'Intenta de nuevo más tarde.')}</p></div>`;
-}
 
 function bindActions(root) {
   root.querySelectorAll('[data-action]').forEach((el) =>

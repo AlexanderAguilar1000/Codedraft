@@ -215,3 +215,27 @@ export function tableSkeletonHTML(columns) {
 export function spinnerHTML(size = 24, label = 'Cargando…') {
   return `<div class="spinner-wrap"><span class="spinner" style="width:${size}px;height:${size}px"></span><span class="spinner__label">${escapeHtml(label)}</span></div>`;
 }
+
+// Shared page header (icon + title + subtitle, optional right-side content
+// like an xp widget). Used by every view so the block isn't rebuilt per-page.
+export function pageHeader({ icon: iconName, title, subtitle, right = '' }) {
+  return `
+    <div class="page-head">
+      <div class="page-head__left">
+        <h1>${icon(iconName, 22, 'page-icon')} ${title}</h1>
+        <p class="page-head__subtitle">${subtitle}</p>
+      </div>
+      ${right}
+    </div>
+  `;
+}
+
+// Shared empty-state box (e.g. "sin cursos en progreso").
+export function emptyBox(iconName, title, desc) {
+  return `<div class="empty-state" style="padding:var(--s-8)"><div class="empty-state__icon">${icon(iconName, 26)}</div><h3>${title}</h3><p>${desc}</p></div>`;
+}
+
+// Shared error box for failed section loads.
+export function errBox(title, msg) {
+  return `<div class="empty-state"><div class="empty-state__icon">${icon('close', 26)}</div><h3>${title}</h3><p>${escapeHtml(msg || 'Intenta de nuevo más tarde.')}</p></div>`;
+}
