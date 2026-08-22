@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -17,21 +16,14 @@ import com.proyecto.codedraft.course.model.Course;
 import com.proyecto.codedraft.course.model.CoursePriority;
 import com.proyecto.codedraft.course.model.CourseStatus;
 import com.proyecto.codedraft.course.repositorio.CourseRepository;
-import com.proyecto.codedraft.profile.service.ProfileService;
 
 @Service
 public class CourseService {
 
     private final CourseRepository courseRepository;
-    private final ProfileService profileService;
-    private final int experiencePointsPerProgressUpdate;
 
-    public CourseService(CourseRepository courseRepository,
-                          ProfileService profileService,
-                          @Value("${app.experience.points-per-progress-update:5}") int experiencePointsPerProgressUpdate) {
+    public CourseService(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
-        this.profileService = profileService;
-        this.experiencePointsPerProgressUpdate = experiencePointsPerProgressUpdate;
     }
 
     public Course registerCourse(CourseRequest request) {
@@ -142,7 +134,8 @@ public class CourseService {
     }
 
 
-    //a este metodo se debe llamar para que  que se aumente punto en el perfil del usuario
+    // actualiza el progreso del curso. No otorga experiencia: es una corrección manual
+    // (ej. arrastrar un slider). La experiencia se otorga solo desde el registro de sesiones de estudio.
     public Course updateProgress(String id, int progress) {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
@@ -156,9 +149,6 @@ public class CourseService {
         course.setStatus(status);
         course.setProgress(progress);
         courseRepository.saveAll(courses);
-
-        // Cada actualización exitosa de progreso otorga puntos de experiencia al perfil
-        profileService.addExperiencePoints(experiencePointsPerProgressUpdate);
 
         return course;
     }
