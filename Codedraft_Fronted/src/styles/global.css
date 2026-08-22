@@ -464,6 +464,8 @@ body::after {
   flex-shrink: 0;
 }
 .action-btn:hover { background: var(--bg-elevated); color: var(--text); }
+.action-btn--progress        { color: var(--success); }
+.action-btn--progress:hover  { color: var(--success); background: var(--success-bg); }
 .action-btn--view        { color: var(--info); }
 .action-btn--view:hover  { color: var(--info); background: var(--info-bg); }
 .action-btn--edit        { color: var(--teal); }

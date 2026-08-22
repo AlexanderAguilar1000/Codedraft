@@ -11,7 +11,9 @@ import {
   icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel,
   statusOptions, priorityOptions, tableSkeletonHTML,
 } from '../utils/ui.js';
-import { openAddModal, openViewModal, openEditModal, openDeleteModal } from './courseModals.js';
+import {
+  openAddModal, openViewModal, openEditModal, openDeleteModal, openProgressModal,
+} from './courseModals.js';
 
 let searchTimer = null;
 
@@ -114,6 +116,10 @@ function renderTable(root, courses) {
   tbody.querySelectorAll('[data-priority-select]').forEach(bindPrioritySelect);
   tbody.querySelectorAll('[data-date-input]').forEach(bindDateInput);
   // Action buttons
+  tbody.querySelectorAll('[data-progress]').forEach((b) => b.addEventListener('click', () => {
+    const course = getState().courses.find((c) => c.id === b.dataset.progress);
+    if (course) openProgressModal(course);
+  }));
   tbody.querySelectorAll('[data-view]').forEach((b) => b.addEventListener('click', () => openViewModal(b.dataset.view)));
   tbody.querySelectorAll('[data-edit]').forEach((b) => b.addEventListener('click', () => openEditModal(b.dataset.edit)));
   tbody.querySelectorAll('[data-delete]').forEach((b) => b.addEventListener('click', () => {
@@ -136,6 +142,7 @@ function rowHTML(c) {
       </div>
     </td>
     <td class="col-actions">
+      <button class="action-btn action-btn--progress" data-progress="${c.id}" title="Registrar progreso" aria-label="Registrar progreso">${icon('trending', 15)}</button>
       <button class="action-btn action-btn--view" data-view="${c.id}" title="Ver detalle" aria-label="Ver">${icon('eye', 15)}</button>
       <button class="action-btn action-btn--edit" data-edit="${c.id}" title="Editar" aria-label="Editar">${icon('edit', 15)}</button>
       <button class="action-btn action-btn--delete" data-delete="${c.id}" title="Eliminar" aria-label="Eliminar">${icon('trash', 15)}</button>

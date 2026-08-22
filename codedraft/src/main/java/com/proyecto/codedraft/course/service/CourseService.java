@@ -140,8 +140,15 @@ public class CourseService {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
 
-        // Si el progreso llega a 100, el curso se marca como Terminado automaticamente
-        CourseStatus status = progress >= 100 ? CourseStatus.COMPLETADO : course.getStatus();
+        // El estado se deriva automaticamente del progreso: 0 = no iniciado, 1-99 = en curso, 100 = completado
+        CourseStatus status;
+        if (progress >= 100) {
+            status = CourseStatus.COMPLETADO;
+        } else if (progress <= 0) {
+            status = CourseStatus.NO_INICIADO;
+        } else {
+            status = CourseStatus.EN_CURSO;
+        }
 
         // Validar consistencia entre status y progress
         validateStatusProgressConsistency(status, progress);

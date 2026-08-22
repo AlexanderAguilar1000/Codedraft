@@ -2,18 +2,18 @@
   "id" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
   "name" : "React Native",
   "description" : "Desarrollo de aplicaciones móviles con React Native",
-  "status" : "NO_INICIADO",
+  "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-05",
-  "progress" : 0
+  "progress" : 5
 }, {
   "id" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
   "name" : "Python para Data Science",
   "description" : "Curso completo de Python enfocado en análisis de datos y machine learning",
-  "status" : "NO_INICIADO",
+  "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-20",
-  "progress" : 0
+  "progress" : 10
 }, {
   "id" : "4e2af9e0-b721-4b6e-a601-8626f3439378",
   "name" : "Cybersecurity Fundamentals",

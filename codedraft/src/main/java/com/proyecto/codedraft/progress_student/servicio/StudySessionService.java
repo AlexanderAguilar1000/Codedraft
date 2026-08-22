@@ -40,6 +40,7 @@ public class StudySessionService {
 
         Course course = courseService.getCourseById(request.getCourseId());
         int newProgress = Math.min(100, course.getProgress() + progressAdded);
+        System.out.println("Progress"+newProgress);
         courseService.updateProgress(request.getCourseId(), newProgress);
 
         Profile profile = profileService.addExperiencePoints(progressAdded);

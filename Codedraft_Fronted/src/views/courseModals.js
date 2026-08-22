@@ -4,6 +4,7 @@
 
 import {
   createCourse, updateCourse, deleteCourse, getCourse, removeSuggestedCourse, getSuggestedCourseNames,
+  registerStudySession,
 } from '../services/api.js';
 import { getState, setLoading } from '../state/store.js';
 import {
@@ -181,6 +182,52 @@ async function submitEdit(modal, id) {
   } finally { setLoading('saving', false); }
 }
 
+// PROGRESS --------------------------------------------------------------------
+// Registers a study session for a course. Duration mapping expected by the
+// backend: "Menos de 1 hora" -> -1, "1 Hora" -> 1, "Más de 1 Hora" -> 2.
+export function openProgressModal(course) {
+  const modal = createModal('progress', 'Registrar progreso', 'trending', 'modal--lg');
+  modal.querySelector('.modal__body').innerHTML = progressFormHTML(course);
+  modal.querySelector('.modal__footer').innerHTML = `
+    <button class="btn btn--ghost" data-close>Cancelar</button>
+    <button class="btn btn--primary" id="progress-submit">${icon('check', 15)} <span>Registrar</span></button>`;
+  document.body.appendChild(modal);
+  wireModalClose(modal);
+  bindClose(modal);
+  modal.querySelector('#progress-submit').addEventListener('click', () => submitProgress(modal, course));
+}
+
+async function submitProgress(modal, course) {
+  const form = modal.querySelector('#progress-form');
+  form.querySelectorAll('.field').forEach((f) => f.classList.remove('has-error'));
+  const date = form.date.value || '';
+  if (!date) {
+    showToast('Selecciona una fecha.', 'error');
+    form.querySelector('[name="date"]')?.closest('.field')?.classList.add('has-error');
+    return;
+  }
+  const data = {
+    courseId: course.id,
+    date,
+    duration: Number(form.duration.value),
+    notes: form.notes.value.trim(),
+  };
+  const btn = modal.querySelector('#progress-submit');
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner" style="width:14px;height:14px"></span> <span>Registrando…</span>`;
+  setLoading('saving', true);
+  try {
+    await registerStudySession(data);
+    showToast('Progreso registrado correctamente.', 'success');
+    modal.remove();
+    await refreshCourses();
+  } catch (err) {
+    showToast(err.message || 'No se pudo registrar el progreso.', 'error');
+    btn.disabled = false;
+    btn.innerHTML = `${icon('check', 15)} <span>Registrar</span>`;
+  } finally { setLoading('saving', false); }
+}
+
 // DELETE --------------------------------------------------------------------
 export function openDeleteModal(course) {
   const modal = createModal('delete', 'Eliminar curso', 'trash', 'modal--sm');
@@ -317,6 +364,39 @@ function suggestedFormHTML(course) {
         <div class="field">
           <label class="field__label" for="course-targetDate">Fecha objetivo</label>
           <input type="date" id="course-targetDate" name="targetDate" />
+        </div>
+      </div>
+    </form>`;
+}
+
+// Used by the Progress modal: name is read-only context, the user picks the
+// session date, a study-time bucket, and can leave a free-text note.
+function progressFormHTML(course) {
+  const c = course || {};
+  const today = new Date().toISOString().slice(0, 10);
+  return `
+    <form id="progress-form" novalidate>
+      <div class="form-grid">
+        <div class="field full">
+          <label class="field__label" for="progress-course-name">Nombre del curso</label>
+          <input type="text" id="progress-course-name" name="courseName" value="${escapeHtml(c.name || '')}" readonly tabindex="-1" />
+        </div>
+        <div class="field">
+          <label class="field__label" for="progress-date">Fecha<span class="req">*</span></label>
+          <input type="date" id="progress-date" name="date" value="${today}" required />
+          <span class="field__error">Selecciona una fecha.</span>
+        </div>
+        <div class="field">
+          <label class="field__label" for="progress-duration">Tiempo de estudio</label>
+          <select id="progress-duration" name="duration">
+            <option value="-1">Menos de 1 hora</option>
+            <option value="1">1 Hora</option>
+            <option value="2">Más de 1 Hora</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label class="field__label" for="progress-notes">Notas</label>
+          <textarea id="progress-notes" name="notes" placeholder="Escribe alguna nota sobre esta sesión de estudio…"></textarea>
         </div>
       </div>
     </form>`;

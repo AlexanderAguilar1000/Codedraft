@@ -1,0 +1,19 @@
+[ {
+  "id" : "83b1b35f-e6a4-4836-a567-bd0152488237",
+  "courseId" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
+  "date" : "2026-08-22",
+  "duration" : -1,
+  "notes" : "REALIZE REPASO COMPONENTE",
+  "progressAdded" : 5,
+  "experiencePoints" : 5,
+  "createdAt" : "2026-08-22T01:10:39.4634438"
+}, {
+  "id" : "cb8a7a0c-ae6c-47d2-a8b0-f7db593d8bcd",
+  "courseId" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
+  "date" : "2026-08-22",
+  "duration" : 1,
+  "notes" : "realize ejercicio de script",
+  "progressAdded" : 10,
+  "experiencePoints" : 15,
+  "createdAt" : "2026-08-22T01:13:03.3045068"
+} ]

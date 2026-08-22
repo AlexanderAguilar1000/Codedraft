@@ -173,6 +173,21 @@ export async function getSuggestedCourses() {
   return res.json();
 }
 
+// ---------------------------------------------------------------------------
+// Study sessions
+// ---------------------------------------------------------------------------
+
+// POST /api/study-sessions
+export async function registerStudySession(session) {
+  const res = await fetch(`${API_BASE}/api/study-sessions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(session),
+  });
+  if (!res.ok) throw await parseError(res);
+  return res.json();
+}
+
 // GET /api/catalogo/suggested/names
 export async function getSuggestedCourseNames() {
   const res = await fetch(`${API_BASE}/api/catalogo/suggested/names`);
