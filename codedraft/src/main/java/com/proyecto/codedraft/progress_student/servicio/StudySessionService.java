@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.proyecto.codedraft.course.model.Course;
+import com.proyecto.codedraft.course.service.CourseAlreadyCompletedException;
 import com.proyecto.codedraft.course.service.CourseService;
 import com.proyecto.codedraft.profile.model.Profile;
 import com.proyecto.codedraft.profile.service.ProfileService;
@@ -39,6 +40,13 @@ public class StudySessionService {
         int progressAdded = resolveProgressAdded(request.getDuration());
 
         Course course = courseService.getCourseById(request.getCourseId());
+
+        // Validar que el curso no esté completado al 100%
+        if (course.getProgress() >= 100) {
+            throw new CourseAlreadyCompletedException(
+                    "No se puede registrar una sesión de estudio en un curso ya completado al 100%");
+        }
+
         int newProgress = Math.min(100, course.getProgress() + progressAdded);
         System.out.println("Progress"+newProgress);
         courseService.updateProgress(request.getCourseId(), newProgress);
@@ -56,6 +64,9 @@ public class StudySessionService {
                 LocalDateTime.now());
 
         List<StudySession> sessions = studySessionRepository.findAll();
+        if (sessions == null) {
+            sessions = new java.util.ArrayList<>();
+        }
         sessions.add(session);
         studySessionRepository.saveAll(sessions);
 
@@ -63,8 +74,9 @@ public class StudySessionService {
     }
 
     // traduce la franja de duracion (-1, 1, 2) enviada por el frontend a puntos de progreso
-    private int resolveProgressAdded(int duration) {
-        return switch (duration) {
+    private int resolveProgressAdded(String duration) {
+        int durationValue = Integer.parseInt(duration);
+        return switch (durationValue) {
             case -1 -> PROGRESS_LESS_THAN_HOUR;
             case 1 -> PROGRESS_ONE_HOUR;
             case 2 -> PROGRESS_MORE_THAN_HOUR;
