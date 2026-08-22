@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import com.proyecto.codedraft.course.service.CourseAlreadyCompletedException;
 import com.proyecto.codedraft.course.service.CourseNotFoundException;
 import com.proyecto.codedraft.profile.service.ProfileNotFoundException;
 import com.proyecto.codedraft.progress_student.dto.StudySessionRequest;
@@ -39,6 +40,11 @@ public class StudySessionController {
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleCourseNotFound(CourseNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(CourseAlreadyCompletedException.class)
+    public ResponseEntity<Map<String, String>> handleCourseAlreadyCompleted(CourseAlreadyCompletedException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", ex.getMessage()));
     }
 
     @ExceptionHandler(ProfileNotFoundException.class)
