@@ -142,14 +142,18 @@ public class CourseService {
     }
 
 
-    //a este metodo se debe llamar para que  que se aumente punto en el perfil del usuario 
+    //a este metodo se debe llamar para que  que se aumente punto en el perfil del usuario
     public Course updateProgress(String id, int progress) {
         List<Course> courses = courseRepository.findAll();
         Course course = findByIdOrThrow(courses, id);
 
-        // Validar consistencia entre status y progress
-        validateStatusProgressConsistency(course.getStatus(), progress);
+        // Si el progreso llega a 100, el curso se marca como Terminado automaticamente
+        CourseStatus status = progress >= 100 ? CourseStatus.COMPLETADO : course.getStatus();
 
+        // Validar consistencia entre status y progress
+        validateStatusProgressConsistency(status, progress);
+
+        course.setStatus(status);
         course.setProgress(progress);
         courseRepository.saveAll(courses);
 
