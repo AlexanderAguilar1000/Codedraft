@@ -54,6 +54,23 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 
 > Cada curso puede asociarse a uno o varios roles profesionales (`roles`), carreras (`careers`) y etiquetas tecnológicas (`tags`). Estos campos se utilizan en el algoritmo de puntuación para las recomendaciones personalizadas (ver sección HU-002/HU-003 y [Logica_recomendacion_cursos_CodeCraftHub.md](./Logica_recomendacion_cursos_CodeCraftHub.md)).
 
+### `study_sessions.json` — Sesiones de estudio registradas (arreglo de objetos)
+
+```json
+{
+  "id": "string (UUID)",
+  "courseId": "string",
+  "date": "yyyy-MM-dd",
+  "duration": "-1 | 1 | 2",
+  "notes": "string",
+  "progressAdded": 0,
+  "experiencePoints": 0,
+  "createdAt": "yyyy-MM-ddTHH:mm:ss"
+}
+```
+
+> `duration` es el código que envía el combobox del frontend: `-1` = menos de 1 hora, `1` = 1 hora, `2` = más de 1 hora. El backend lo traduce a `progressAdded` (5, 10 o 15 puntos) y lo suma al `progress` del curso. `experiencePoints` es el **total acumulado del perfil** (`profile.experiencePoints`) justo después de registrar la sesión, no el delta ganado. Ver sección 7.
+
 ### Estructuras del servicio de IA (no persistidas, solo request/response)
 
 ```json
@@ -88,7 +105,7 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 | PATCH | `/api/courses/{id}/status` | Actualizar el estado de un curso. |
 | PATCH | `/api/courses/{id}/priority` | Actualizar la prioridad de un curso. |
 | PATCH | `/api/courses/{id}/target-date` | Actualizar la fecha objetivo de un curso. |
-| PATCH | `/api/courses/{id}/progress` | Actualizar el progreso de un curso (dispara coach y puntos de experiencia). |
+| PATCH | `/api/courses/{id}/progress` | Corrección manual del progreso de un curso. **No** otorga puntos de experiencia (ver HU-016). |
 | PATCH | `/api/courses/{id}/update` | Actualizar múltiples campos de un curso (status, priority, progress, targetDate) en una sola llamada. |
 | DELETE | `/api/courses/{id}` | Eliminar un curso. |
 | GET | `/api/courses/{id}` | Obtener el detalle de un curso por ID. |
@@ -96,6 +113,7 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 | GET | `/api/courses/stats` | Obtener estadísticas de los cursos (total, por estado, por prioridad, promedio de progreso). |
 | GET | `/api/courses/recommendation` | Obtener el siguiente curso recomendado. |
 | GET | `/api/courses/suggested` | Obtener cursos sugeridos del catálogo según el perfil. |
+| POST | `/api/study-sessions` | Registrar una sesión de estudio: avanza el progreso del curso y otorga experiencia al perfil según la duración. |
 
 ### Servicio de IA (Flask)
 
@@ -173,9 +191,9 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 
 | ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
 |----|-------|------|-----------|---------------|---------------------------|
-| TT-017 | Desarrollar endpoint para actualizar el progreso (`PATCH /api/courses/{id}/progress`) | BE | Alta | TT-006, TT-011 | Valida rango 0-100, actualiza `courses.json` y cambia el estado a "Completado" automáticamente cuando progreso = 100. |
+| TT-017 | Desarrollar endpoint para actualizar el progreso (`PATCH /api/courses/{id}/progress`) | BE | Alta | TT-006, TT-011 | Valida rango 0-100, actualiza `courses.json` y cambia el estado a "Completado" automáticamente cuando progreso = 100. **No otorga experiencia**: es una corrección manual (ver HU-016). |
 | TT-018 | Agregar control de progreso (slider/input) en la interfaz | FE | Alta | TT-009 | El control restringe valores entre 0 y 100 y envía la actualización al backend. |
-| TT-019 | Conectar la actualización de progreso con el coach y los puntos de experiencia | BE | Media | TT-017 | Cada actualización exitosa invoca al servicio de IA para el mensaje motivador y suma puntos de experiencia al perfil. |
+| ~~TT-019~~ | ~~Conectar la actualización de progreso con el coach y los puntos de experiencia~~ | BE | Media | TT-017 | **Reemplazada por HU-016.** La asignación de experiencia se movió al registro de sesiones de estudio para evitar que el progreso se otorgue dos veces (una por la sesión y otra por este PATCH). La integración con el coach de IA sigue pendiente (HU-013). |
 
 ---
 
@@ -252,23 +270,37 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 | ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
 |----|-------|------|-----------|---------------|---------------------------|
 | TT-036 | Agregar el campo de puntos de experiencia al perfil | BE | Media | TT-002 | `profile.json` incluye `experiencePoints` inicializado en 0. |
-| TT-037 | Sumar puntos de experiencia en cada actualización de progreso | BE | Media | TT-019, TT-036 | Cada actualización exitosa incrementa `experiencePoints` en +5 (configurable) y persiste el cambio en `profile.json`. |
+| ~~TT-037~~ | ~~Sumar puntos de experiencia en cada actualización de progreso~~ | BE | Media | TT-036 | **Reemplazada por HU-016.** Ya no se suma un monto fijo (+5) por cada `PATCH /progress`; los puntos ahora dependen de la duración de la sesión de estudio registrada (5, 10 o 15). |
 | TT-038 | Desarrollar endpoint para consultar los puntos (`GET /api/profile/points`) | BE | Media | TT-036 | Retorna el total acumulado de puntos de experiencia. |
 | TT-039 | Mostrar los puntos de experiencia en el header/dashboard | FE | Media | TT-038 | El total de puntos se actualiza visualmente tras cada actualización de progreso. |
 
 ---
 
+### HU-016 Registrar sesión de estudio y ganar experiencia según el tiempo dedicado
+
+> Sustituye el otorgamiento automático de experiencia de HU-008/HU-015. El usuario ya no ingresa un puntaje: registra cuánto estudió (curso, fecha, duración, notas) y el backend calcula el avance del curso y la experiencia ganada en una sola operación atómica. Ver el detalle de la lógica en la sección 7.
+
+| ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
+|----|-------|------|-----------|---------------|---------------------------|
+| TT-040 | Modelar el recurso `StudySession` y su repositorio JSON (`study_sessions.json`) en el paquete `progress_student` | BE | Alta | TT-036 | El modelo persiste `id`, `courseId`, `date`, `duration`, `notes`, `progressAdded`, `experiencePoints` y `createdAt`; el repositorio sigue el mismo patrón findAll/saveAll que `CourseRepository`/`ProfileRepository`. |
+| TT-041 | Desarrollar endpoint para registrar sesiones de estudio (`POST /api/study-sessions`) | BE | Alta | TT-006, TT-017, TT-040 | Valida `courseId`, `date` y `duration` (`-1`, `1` o `2`); traduce la duración a `progressAdded` (5/10/15) y actualiza el progreso del curso vía `updateProgress`, capando en 100. Responde 404 si el curso no existe y 400 si el curso ya está al 100% o la duración es inválida. |
+| TT-042 | Otorgar experiencia al perfil desde el registro de sesión, sin duplicarla en `PATCH /progress` | BE | Alta | TT-019, TT-037, TT-041 | `updateProgress()` ya no suma experiencia (se le quitó la dependencia de `ProfileService`); la única vía para ganar experiencia es `POST /api/study-sessions`, que suma `progressAdded` al perfil y guarda el total resultante como `experiencePoints` de la sesión. |
+| TT-043 | Maquetar el modal de registro de sesión de estudio con combobox de duración | FE | Alta | TT-009 | El modal captura curso, fecha, notas y un combobox con las opciones "Menos de 1 hora" (-1), "1 hora" (1) y "Más de 1 hora" (2); no incluye ningún campo de puntaje manual. |
+| TT-044 | Conectar el modal con `POST /api/study-sessions` y refrescar progreso/experiencia en la interfaz | FE | Alta | TT-041, TT-043 | Al guardar, la lista de cursos y el contador de experiencia del header se actualizan con los valores devueltos por el backend; los errores (curso completado, duración inválida) se muestran en el modal. |
+
+---
+
 ## 4. Resumen
 
-- **Total de tareas técnicas:** 39 (TT-001 a TT-039), a nivel de funcionalidad (endpoint o componente de interfaz completo).
-- **Orden de construcción:** HU-001 → HU-004 → HU-005 → HU-010 → HU-006 → HU-007 → HU-008 → HU-009 → HU-011 → HU-002/HU-003 → HU-012 → HU-013 → HU-014 → HU-015.
-- **Sin base de datos:** toda la persistencia se resuelve leyendo/escribiendo `profile.json`, `courses.json` y `catalog.json` con Jackson desde el backend de Spring Boot.
+- **Total de tareas técnicas:** 44 (TT-001 a TT-044), a nivel de funcionalidad (endpoint o componente de interfaz completo). TT-019 y TT-037 quedaron reemplazadas por HU-016.
+- **Orden de construcción:** HU-001 → HU-004 → HU-005 → HU-010 → HU-006 → HU-007 → HU-008 → HU-009 → HU-011 → HU-002/HU-003 → HU-012 → HU-013 → HU-014 → HU-015 → HU-016.
+- **Sin base de datos:** toda la persistencia se resuelve leyendo/escribiendo `profile.json`, `courses.json`, `catalog.json` y `study_sessions.json` con Jackson desde el backend de Spring Boot.
 
 
 ---
 ## 5 Tareas completadas 
 HU-001 → HU-004 → HU-005 → HU-010 → HU-006 -> HU-007 Actualizar la fecha objetivo de un curso , HU-008 Actualizar el progreso de un curso , H09 Eliminar un curso 
-Hu-011 , HU-002 Recomendaciones personalizadas + HU-003 Cursos sugeridos ,  HU-015
+Hu-011 , HU-002 Recomendaciones personalizadas + HU-003 Cursos sugeridos ,  HU-015 , HU-016 Registrar sesión de estudio y ganar experiencia según el tiempo dedicado
 
 Las demas historias de usuario faltan es para la IA 
 
@@ -286,3 +318,29 @@ Se implementa un **algoritmo de puntuación** basado en el perfil del usuario, s
 
 **Fallback:** si ningún curso obtiene puntaje > 0, se retorna el catálogo completo ordenado alfabéticamente.
 
+
+----
+## 7 Lógica de sesiones de estudio y experiencia — STUDY_SESSIONS.JSON
+
+Implementado en el paquete `com.proyecto.codedraft.progress_student` (`controller`, `dto`, `model`, `repositorio`, `servicio`), siguiendo la misma arquitectura por capas que `course` y `profile`.
+
+**Motivación:** originalmente `PATCH /api/courses/{id}/progress` recibía el progreso ya calculado por el frontend y, además, otorgaba +5 de experiencia fija en cada llamada. Eso permitía que el usuario "inventara" el progreso y generaba doble conteo de experiencia si el mismo cambio pasaba por dos caminos. Ahora el progreso y la experiencia se derivan **siempre en el backend**, a partir de una sesión de estudio real.
+
+### Flujo de `POST /api/study-sessions`
+
+1. El frontend abre un modal con: curso, fecha, duración (combobox) y notas — **sin** campo de puntaje.
+2. El combobox envía un código entero como `duration`: `-1` (menos de 1 hora), `1` (1 hora) o `2` (más de 1 hora).
+3. El backend traduce `duration` a `progressAdded`:
+
+   | `duration` | Significado | `progressAdded` |
+   |---|---|---|
+   | `-1` | Menos de 1 hora | 5 |
+   | `1` | 1 hora | 10 |
+   | `2` | Más de 1 hora | 15 |
+
+4. Se valida que el curso no esté ya al 100% (`CourseAlreadyCompletedException` si lo está).
+5. El nuevo progreso del curso es `min(100, progreso actual + progressAdded)` y se persiste llamando a `CourseService.updateProgress(...)`.
+6. Se suma `progressAdded` al perfil vía `ProfileService.addExperiencePoints(...)`; el total resultante se guarda en la sesión como `experiencePoints` (snapshot del perfil, no el delta de esta sesión — un mismo usuario puede tener varios cursos en curso y el perfil acumula experiencia de todos).
+7. Se guarda la sesión completa en `study_sessions.json`.
+
+**Camino elegido para evitar el doble conteo (A):** `CourseService.updateProgress()` ya **no** depende de `ProfileService` ni otorga experiencia — quedó como una corrección manual de progreso (p. ej. arrastrar un slider), sin recompensa. La experiencia solo se otorga desde `POST /api/study-sessions`.

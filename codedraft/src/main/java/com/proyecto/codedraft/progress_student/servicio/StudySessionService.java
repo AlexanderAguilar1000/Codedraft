@@ -37,7 +37,8 @@ public class StudySessionService {
 
     // registra una sesion de estudio: calcula el avance del curso y otorga experiencia al perfil en un solo paso
     public StudySession registerSession(StudySessionRequest request) {
-        int progressAdded = resolveProgressAdded(request.getDuration());
+        int duration = Integer.parseInt(request.getDuration());
+        int progressAdded = resolveProgressAdded(duration);
 
         Course course = courseService.getCourseById(request.getCourseId());
 
@@ -48,7 +49,6 @@ public class StudySessionService {
         }
 
         int newProgress = Math.min(100, course.getProgress() + progressAdded);
-        System.out.println("Progress"+newProgress);
         courseService.updateProgress(request.getCourseId(), newProgress);
 
         Profile profile = profileService.addExperiencePoints(progressAdded);
@@ -57,16 +57,13 @@ public class StudySessionService {
                 UUID.randomUUID().toString(),
                 request.getCourseId(),
                 request.getDate(),
-                request.getDuration(),
+                duration,
                 request.getNotes(),
                 progressAdded,
                 profile.getExperiencePoints(),
                 LocalDateTime.now());
 
         List<StudySession> sessions = studySessionRepository.findAll();
-        if (sessions == null) {
-            sessions = new java.util.ArrayList<>();
-        }
         sessions.add(session);
         studySessionRepository.saveAll(sessions);
 
@@ -74,9 +71,8 @@ public class StudySessionService {
     }
 
     // traduce la franja de duracion (-1, 1, 2) enviada por el frontend a puntos de progreso
-    private int resolveProgressAdded(String duration) {
-        int durationValue = Integer.parseInt(duration);
-        return switch (durationValue) {
+    private int resolveProgressAdded(int duration) {
+        return switch (duration) {
             case -1 -> PROGRESS_LESS_THAN_HOUR;
             case 1 -> PROGRESS_ONE_HOUR;
             case 2 -> PROGRESS_MORE_THAN_HOUR;
