@@ -16,4 +16,13 @@
   "progressAdded" : 10,
   "experiencePoints" : 15,
   "createdAt" : "2026-08-22T01:13:03.3045068"
+}, {
+  "id" : "c6ec9da0-f62f-4211-9784-16eeb7055f2f",
+  "courseId" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
+  "date" : "2026-08-23",
+  "duration" : -1,
+  "notes" : "Aprendi sobre estruucutea del proyecto",
+  "progressAdded" : 5,
+  "experiencePoints" : 20,
+  "createdAt" : "2026-08-23T21:01:40.8525355"
 } ]

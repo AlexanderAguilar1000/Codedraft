@@ -5,7 +5,7 @@
   "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-05",
-  "progress" : 5
+  "progress" : 10
 }, {
   "id" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
   "name" : "Python para Data Science",
