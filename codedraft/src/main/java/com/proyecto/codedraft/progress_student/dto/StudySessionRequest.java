@@ -21,6 +21,7 @@ public class StudySessionRequest {
     @Pattern(regexp = "-1|1|2", message = "La duración debe ser -1 (menos de 1 hora), 1 (1 hora) o 2 (más de 1 hora)")
     private String duration;
 
+    @NotBlank(message = "Las notas son obligatorias")
     private String notes;
 
     public StudySessionRequest() {
