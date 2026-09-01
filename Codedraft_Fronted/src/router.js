@@ -1,6 +1,7 @@
 // CodeCraftHub — client-side router and header (dark theme).
 import { getState, setState, subscribe } from './state/store.js';
 import { icon } from './utils/ui.js';
+import { currentTheme, toggleTheme } from './utils/theme.js';
 import { renderProfile } from './views/profile.js';
 import { renderDashboard } from './views/dashboard.js';
 import { renderCourses } from './views/courses.js';
@@ -68,6 +69,9 @@ function renderHeader() {
     </div>
     <nav class="app-header__nav" id="app-nav">${navLinks}</nav>
     <div class="app-header__right">
+      <button class="app-header__theme-btn" id="theme-toggle" aria-label="Cambiar tema" title="Cambiar tema">
+        ${icon(currentTheme() === 'light' ? 'moon' : 'sun', 17)}
+      </button>
       <div class="header-profile" title="${escapeAttr(state.profile?.rol || 'Tu perfil')}">
         <span class="header-profile__avatar">${initial}</span>
         <span class="header-profile__name">${escapeText(state.profile?.rol || 'Perfil')}</span>
@@ -77,6 +81,10 @@ function renderHeader() {
     </div>
   `;
 
+  header.querySelector('#theme-toggle').addEventListener('click', (e) => {
+    const next = toggleTheme();
+    e.currentTarget.innerHTML = icon(next === 'light' ? 'moon' : 'sun', 17);
+  });
   header.querySelector('.header-profile').addEventListener('click', () => navigate('profile'));
   header.querySelector('#menu-toggle')?.addEventListener('click', () =>
     header.querySelector('#app-nav').classList.toggle('is-open')

@@ -26,8 +26,8 @@
   "id" : "e2fd502b-950a-4b6c-84e5-71257e826ed1",
   "name" : "Java Avanzado",
   "description" : "Curso avanzado de Java con patrones de diseño y arquitectura",
-  "status" : "NO_INICIADO",
+  "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-12-12",
-  "progress" : 0
+  "progress" : 5
 } ]

@@ -88,4 +88,19 @@
   "mentorWhyItMatters" : "En desarrollo móvil, los componentes reutilizables permiten construir interfaces consistentes y acelerar el desarrollo; para un Backend Developer, entenderlos facilita diseñar APIs que se integren de forma predecible con la UI.",
   "mentorRealWorldUse" : "En una app de pedidos, podrías crear un componente <ProductCard> que muestra información del producto y se comunica con tu API de Spring Boot para obtener los datos.",
   "mentorChallenge" : "Implementa un componente funcional llamado 'UserCard' que reciba nombre, avatar y estado como props, y que al presionar un botón interno haga una llamada fetch a tu endpoint '/api/users/{id}' y muestre la respuesta."
+}, {
+  "id" : "3af3c109-05f4-4be9-a40f-2d27d0a2f2c0",
+  "courseId" : "e2fd502b-950a-4b6c-84e5-71257e826ed1",
+  "date" : "2026-09-01",
+  "duration" : -1,
+  "notes" : "Aprendi sobre arquitectura hexagonal se puede adaptar a diferente base de datos",
+  "progressAdded" : 5,
+  "experiencePoints" : 40,
+  "createdAt" : "2026-09-01T17:14:14.8453146",
+  "mentorCharacter" : "Mentor CodeDraft",
+  "mentorValid" : true,
+  "mentorMessage" : "¡Excelente! Has comprendido la arquitectura hexagonal y su flexibilidad.",
+  "mentorWhyItMatters" : "En el backend, la arquitectura hexagonal permite aislar la lógica de negocio de detalles de infraestructura como bases de datos o APIs, facilitando pruebas unitarias, mantenibilidad y la posibilidad de cambiar de tecnología sin afectar el núcleo.",
+  "mentorRealWorldUse" : "En un proyecto Spring Boot podrías estructurar tu aplicación con puertos y adaptadores, creando un puerto para el repositorio y dos adaptadores: uno que use JPA y otro que use una base de datos NoSQL, y cambiar entre ellos mediante configuración.",
+  "mentorChallenge" : "Crea un pequeño microservicio CRUD en Spring Boot usando arquitectura hexagonal: define un puerto de repositorio, implementa dos adaptadores (uno con H2 en memoria y otro con PostgreSQL) y escribe pruebas unitarias que usen solo el núcleo."
 } ]

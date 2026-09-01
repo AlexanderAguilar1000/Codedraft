@@ -115,7 +115,7 @@
 .achievement__icon {
   width: 34px; height: 34px; border-radius: 50%;
   display: grid; place-items: center; flex-shrink: 0;
-  background: rgba(255,255,255,0.05); color: var(--text-muted);
+  background: var(--overlay-hover); color: var(--text-muted);
 }
 .achievement__icon svg { width: 17px; height: 17px; }
 .achievement__title { font-size: 0.84rem; font-weight: 700; color: var(--text-soft); }

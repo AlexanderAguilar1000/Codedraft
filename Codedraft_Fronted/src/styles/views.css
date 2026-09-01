@@ -31,7 +31,7 @@
 @media (max-width:900px) { .dash-hero { grid-template-columns: 1fr; } }
 
 .welcome-card {
-  background: linear-gradient(135deg, #1a2035, #161b2e);
+  background: linear-gradient(135deg, var(--bg-card-alt), var(--bg-card));
   border: 1px solid var(--border-mid);
   border-radius: var(--r-2xl);
   padding: clamp(1.25rem, 2vw, 2rem);
@@ -88,7 +88,7 @@
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   padding: var(--s-5);
-  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur-slow) var(--ease);
 }
 .kpi:hover { transform: translateY(-2px); border-color: var(--border-mid); box-shadow: var(--shadow-hover); }
 .kpi__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-3); }
@@ -97,7 +97,7 @@
 .kpi__icon--primary { background: var(--teal-subtle); color: var(--teal); }
 .kpi__icon--success { background: var(--success-bg); color: var(--success); }
 .kpi__icon--warning { background: var(--warning-bg); color: var(--warning); }
-.kpi__icon--neutral  { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+.kpi__icon--neutral  { background: var(--overlay-hover); color: var(--text-muted); }
 .kpi__icon--accent   { background: var(--danger-bg); color: var(--priority-high); }
 .kpi__value { font-size: 1.7rem; font-weight: 800; line-height: 1; color: var(--heading); font-variant-numeric: tabular-nums; }
 .kpi__label { font-size: 0.78rem; color: var(--text-muted); margin-top: var(--s-1); }
@@ -177,7 +177,7 @@
   border-radius: var(--r-xl);
   padding: var(--s-5);
   display: flex; flex-direction: column;
-  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur-slow) var(--ease);
   position: relative;
 }
 .catalog-card:hover { transform: translateY(-3px); border-color: var(--border-strong); box-shadow: var(--shadow-hover); }
@@ -210,7 +210,7 @@
   display: inline-flex; align-items: center; gap: var(--s-2);
   padding: 5px var(--s-3);
   border-radius: var(--r-pill);
-  background: rgba(255,255,255,0.06);
+  background: var(--overlay-hover);
   border: 1px solid var(--border);
   font-size: 0.76rem; color: var(--text-soft); font-weight: 500;
 }
