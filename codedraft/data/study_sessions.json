@@ -73,4 +73,19 @@
   "mentorWhyItMatters" : "Como Backend Developer, usar entornos virtuales te permite mantener versiones consistentes de librerías entre diferentes servicios Python, evitando conflictos y facilitando despliegues reproducibles.",
   "mentorRealWorldUse" : "En un proyecto real, podrías crear un entorno virtual para cada microservicio Python (por ejemplo, un API con Flask o FastAPI) y especificar sus dependencias en un requirements.txt, garantizando que el entorno de producción coincida con el de desarrollo.",
   "mentorChallenge" : "Crea un nuevo proyecto Flask, inicializa un entorno virtual, instala Flask==2.0.3 y una versión específica de SQLAlchemy, escribe un endpoint simple y ejecuta la aplicación dentro del entorno."
+}, {
+  "id" : "79d54cf8-c263-46ce-b77b-2a3af3e3fe44",
+  "courseId" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
+  "date" : "2026-09-01",
+  "duration" : -1,
+  "notes" : "Un componente es una pieza reutilizable de la interfaz de una aplicación móvil. En React Native, normalmente se crea como una función que devuelve elementos visuales.",
+  "progressAdded" : 5,
+  "experiencePoints" : 35,
+  "createdAt" : "2026-09-01T16:34:59.6456946",
+  "mentorCharacter" : "Mentor CodeDraft",
+  "mentorValid" : true,
+  "mentorMessage" : "¡Buen trabajo! Captaste la esencia de los componentes en React Native.",
+  "mentorWhyItMatters" : "En desarrollo móvil, los componentes reutilizables permiten construir interfaces consistentes y acelerar el desarrollo; para un Backend Developer, entenderlos facilita diseñar APIs que se integren de forma predecible con la UI.",
+  "mentorRealWorldUse" : "En una app de pedidos, podrías crear un componente <ProductCard> que muestra información del producto y se comunica con tu API de Spring Boot para obtener los datos.",
+  "mentorChallenge" : "Implementa un componente funcional llamado 'UserCard' que reciba nombre, avatar y estado como props, y que al presionar un botón interno haga una llamada fetch a tu endpoint '/api/users/{id}' y muestre la respuesta."
 } ]

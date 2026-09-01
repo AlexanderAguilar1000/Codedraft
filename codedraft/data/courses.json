@@ -5,7 +5,7 @@
   "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-05",
-  "progress" : 15
+  "progress" : 20
 }, {
   "id" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
   "name" : "Python para Data Science",
@@ -21,5 +21,13 @@
   "status" : "NO_INICIADO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-20",
+  "progress" : 0
+}, {
+  "id" : "e2fd502b-950a-4b6c-84e5-71257e826ed1",
+  "name" : "Java Avanzado",
+  "description" : "Curso avanzado de Java con patrones de diseño y arquitectura",
+  "status" : "NO_INICIADO",
+  "priority" : "ALTA",
+  "targetDate" : "2026-12-12",
   "progress" : 0
 } ]

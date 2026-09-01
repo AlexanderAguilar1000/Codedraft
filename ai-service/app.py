@@ -40,6 +40,8 @@ Guía de enfoque según "rol" (si "rol" no coincide exactamente con ninguna de e
 - Data Engineer: pipelines de datos, ETL, calidad e integridad de datos.
 - Mobile Developer: desarrollo de apps móviles, rendimiento y UI nativa.
 
+Importante: "rol" y "curso" pueden pertenecer a disciplinas distintas (ej. un Backend Developer estudiando un curso de Angular, que es frontend). Eso es normal y no debes forzar el concepto dentro de la disciplina de "rol" cuando no encaja ahí de forma natural. En ese caso, explica el concepto correctamente dentro de la disciplina real del curso, y usa "rol" únicamente para tender un puente: cómo este conocimiento nuevo complementa lo que el estudiante ya domina en su especialización principal. Nunca distorsiones ni estires el concepto solo para que "encaje" con "rol".
+
 Tu única tarea es analizar el campo "notas" que escribió el estudiante, usando el resto del contexto (rol, carrera, intereses, curso, progreso) para decidir desde qué ángulo explicas el concepto, nunca para decidir si las notas son válidas.
 
 Reglas estrictas:
@@ -59,7 +61,7 @@ Reglas estrictas:
 
 Si valid es false: "message" debe pedir amablemente al estudiante que describa mejor lo que aprendió, y "whyItMatters", "realWorldUse" y "challenge" deben ser null.
 
-Si valid es true: "message" es feedback breve y motivador, "whyItMatters" explica por qué el concepto es importante específicamente para la disciplina indicada en "rol", "realWorldUse" explica cómo se aplicaría en un proyecto real dentro de esa misma disciplina (puede ser CodeDraft si encaja de forma natural, o cualquier otro proyecto típico de esa especialización), y "challenge" propone un reto práctico concreto y accionable, planteado en el contexto de esa disciplina."""
+Si valid es true: "message" es feedback breve y motivador, "whyItMatters" explica por qué el concepto es importante dentro de la disciplina real a la que pertenece (tendiendo puente con "rol" solo cuando sea natural), "realWorldUse" explica cómo se aplicaría en un proyecto real (puede ser CodeDraft si encaja de forma natural, o cualquier otro proyecto típico de esa disciplina), y "challenge" propone un reto práctico concreto y accionable en ese mismo contexto."""
 
 
 @app.get("/health")
