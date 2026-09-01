@@ -17,6 +17,14 @@ public class StudySession {
     private int experiencePoints; // total acumulado del perfil despues de esta sesion
     private LocalDateTime createdAt;
 
+    // Feedback del Mentor IA para esta sesion. Quedan en null si el servicio de IA no respondio.
+    private String mentorCharacter;
+    private Boolean mentorValid;
+    private String mentorMessage;
+    private String mentorWhyItMatters;
+    private String mentorRealWorldUse;
+    private String mentorChallenge;
+
     public StudySession() {
     }
 
@@ -28,7 +36,13 @@ public class StudySession {
                          @JsonProperty("notes") String notes,
                          @JsonProperty("progressAdded") int progressAdded,
                          @JsonProperty("experiencePoints") int experiencePoints,
-                         @JsonProperty("createdAt") LocalDateTime createdAt) {
+                         @JsonProperty("createdAt") LocalDateTime createdAt,
+                         @JsonProperty("mentorCharacter") String mentorCharacter,
+                         @JsonProperty("mentorValid") Boolean mentorValid,
+                         @JsonProperty("mentorMessage") String mentorMessage,
+                         @JsonProperty("mentorWhyItMatters") String mentorWhyItMatters,
+                         @JsonProperty("mentorRealWorldUse") String mentorRealWorldUse,
+                         @JsonProperty("mentorChallenge") String mentorChallenge) {
         this.id = id;
         this.courseId = courseId;
         this.date = date;
@@ -37,6 +51,12 @@ public class StudySession {
         this.progressAdded = progressAdded;
         this.experiencePoints = experiencePoints;
         this.createdAt = createdAt;
+        this.mentorCharacter = mentorCharacter;
+        this.mentorValid = mentorValid;
+        this.mentorMessage = mentorMessage;
+        this.mentorWhyItMatters = mentorWhyItMatters;
+        this.mentorRealWorldUse = mentorRealWorldUse;
+        this.mentorChallenge = mentorChallenge;
     }
 
     public String getId() {
@@ -101,5 +121,53 @@ public class StudySession {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getMentorCharacter() {
+        return mentorCharacter;
+    }
+
+    public void setMentorCharacter(String mentorCharacter) {
+        this.mentorCharacter = mentorCharacter;
+    }
+
+    public Boolean getMentorValid() {
+        return mentorValid;
+    }
+
+    public void setMentorValid(Boolean mentorValid) {
+        this.mentorValid = mentorValid;
+    }
+
+    public String getMentorMessage() {
+        return mentorMessage;
+    }
+
+    public void setMentorMessage(String mentorMessage) {
+        this.mentorMessage = mentorMessage;
+    }
+
+    public String getMentorWhyItMatters() {
+        return mentorWhyItMatters;
+    }
+
+    public void setMentorWhyItMatters(String mentorWhyItMatters) {
+        this.mentorWhyItMatters = mentorWhyItMatters;
+    }
+
+    public String getMentorRealWorldUse() {
+        return mentorRealWorldUse;
+    }
+
+    public void setMentorRealWorldUse(String mentorRealWorldUse) {
+        this.mentorRealWorldUse = mentorRealWorldUse;
+    }
+
+    public String getMentorChallenge() {
+        return mentorChallenge;
+    }
+
+    public void setMentorChallenge(String mentorChallenge) {
+        this.mentorChallenge = mentorChallenge;
     }
 }

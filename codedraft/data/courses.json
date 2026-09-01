@@ -5,7 +5,7 @@
   "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-05",
-  "progress" : 10
+  "progress" : 15
 }, {
   "id" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
   "name" : "Python para Data Science",
@@ -13,7 +13,7 @@
   "status" : "EN_CURSO",
   "priority" : "ALTA",
   "targetDate" : "2026-09-20",
-  "progress" : 10
+  "progress" : 15
 }, {
   "id" : "4e2af9e0-b721-4b6e-a601-8626f3439378",
   "name" : "Cybersecurity Fundamentals",

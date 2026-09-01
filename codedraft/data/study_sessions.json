@@ -6,7 +6,13 @@
   "notes" : "REALIZE REPASO COMPONENTE",
   "progressAdded" : 5,
   "experiencePoints" : 5,
-  "createdAt" : "2026-08-22T01:10:39.4634438"
+  "createdAt" : "2026-08-22T01:10:39.4634438",
+  "mentorCharacter" : null,
+  "mentorValid" : null,
+  "mentorMessage" : null,
+  "mentorWhyItMatters" : null,
+  "mentorRealWorldUse" : null,
+  "mentorChallenge" : null
 }, {
   "id" : "cb8a7a0c-ae6c-47d2-a8b0-f7db593d8bcd",
   "courseId" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
@@ -15,7 +21,13 @@
   "notes" : "realize ejercicio de script",
   "progressAdded" : 10,
   "experiencePoints" : 15,
-  "createdAt" : "2026-08-22T01:13:03.3045068"
+  "createdAt" : "2026-08-22T01:13:03.3045068",
+  "mentorCharacter" : null,
+  "mentorValid" : null,
+  "mentorMessage" : null,
+  "mentorWhyItMatters" : null,
+  "mentorRealWorldUse" : null,
+  "mentorChallenge" : null
 }, {
   "id" : "c6ec9da0-f62f-4211-9784-16eeb7055f2f",
   "courseId" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
@@ -24,5 +36,41 @@
   "notes" : "Aprendi sobre estruucutea del proyecto",
   "progressAdded" : 5,
   "experiencePoints" : 20,
-  "createdAt" : "2026-08-23T21:01:40.8525355"
+  "createdAt" : "2026-08-23T21:01:40.8525355",
+  "mentorCharacter" : null,
+  "mentorValid" : null,
+  "mentorMessage" : null,
+  "mentorWhyItMatters" : null,
+  "mentorRealWorldUse" : null,
+  "mentorChallenge" : null
+}, {
+  "id" : "aeb2416a-4f3d-4eb9-9a38-463527c56604",
+  "courseId" : "c495af88-0d83-4548-b3db-c95c1023b3c7",
+  "date" : "2026-09-01",
+  "duration" : -1,
+  "notes" : "Hoy aprendi sobre que los componentes son bloques de código que se pueden reutilizar en toda la aplicación .",
+  "progressAdded" : 5,
+  "experiencePoints" : 25,
+  "createdAt" : "2026-09-01T14:52:31.547993",
+  "mentorCharacter" : "Mentor CodeDraft",
+  "mentorValid" : true,
+  "mentorMessage" : "¡Buen trabajo! Entender que los componentes son bloques reutilizables es una base clave.",
+  "mentorWhyItMatters" : "En el desarrollo backend, los componentes (por ejemplo, servicios, repositorios o beans en Spring) permiten estructurar la lógica de negocio de forma modular, facilitando el mantenimiento, la prueba y la escalabilidad de la aplicación.",
+  "mentorRealWorldUse" : "En un proyecto Spring Boot podrías crear un @Component que gestione la autenticación JWT y reutilizarlo en varios controladores, evitando duplicar código y centralizando la lógica de seguridad.",
+  "mentorChallenge" : "Implementa un @Component en tu próximo proyecto Spring Boot que proporcione funciones de validación de datos comunes (p. ej., email, número de teléfono) y úsalo en al menos dos controladores diferentes."
+}, {
+  "id" : "59631762-158a-4b39-80fd-d290e47c59f9",
+  "courseId" : "3c92bd12-219e-4830-a9d3-1c3d3ed86694",
+  "date" : "2026-09-01",
+  "duration" : -1,
+  "notes" : "Hoy aprendi que existe los entornos virtuales en python. Que permite descargar ciertas librerias en determinadas versiones , pero solo para el proyecto que estoy desarrollando",
+  "progressAdded" : 5,
+  "experiencePoints" : 30,
+  "createdAt" : "2026-09-01T14:56:43.4594756",
+  "mentorCharacter" : "Mentor CodeDraft",
+  "mentorValid" : true,
+  "mentorMessage" : "¡Buen trabajo! Entender los entornos virtuales es clave para gestionar dependencias de forma aislada.",
+  "mentorWhyItMatters" : "Como Backend Developer, usar entornos virtuales te permite mantener versiones consistentes de librerías entre diferentes servicios Python, evitando conflictos y facilitando despliegues reproducibles.",
+  "mentorRealWorldUse" : "En un proyecto real, podrías crear un entorno virtual para cada microservicio Python (por ejemplo, un API con Flask o FastAPI) y especificar sus dependencias en un requirements.txt, garantizando que el entorno de producción coincida con el de desarrollo.",
+  "mentorChallenge" : "Crea un nuevo proyecto Flask, inicializa un entorno virtual, instala Flask==2.0.3 y una versión específica de SQLAlchemy, escribe un endpoint simple y ejecuta la aplicación dentro del entorno."
 } ]

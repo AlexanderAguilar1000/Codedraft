@@ -217,15 +217,63 @@ async function submitProgress(modal, course) {
   btn.innerHTML = `<span class="spinner" style="width:14px;height:14px"></span> <span>Registrando…</span>`;
   setLoading('saving', true);
   try {
-    await registerStudySession(data);
+    const session = await registerStudySession(data);
     showToast('Progreso registrado correctamente.', 'success');
-    modal.remove();
     await refreshCourses();
+    showMentorFeedback(modal, session);
   } catch (err) {
     showToast(err.message || 'No se pudo registrar el progreso.', 'error');
     btn.disabled = false;
     btn.innerHTML = `${icon('check', 15)} <span>Registrar</span>`;
   } finally { setLoading('saving', false); }
+}
+
+// Reemplaza el formulario por el feedback del Mentor IA dentro del mismo modal.
+// Si el servicio de IA no respondió (mentorCharacter viene null), simplemente se cierra el modal:
+// la sesión ya quedó registrada, no hay nada de IA que mostrar.
+function showMentorFeedback(modal, session) {
+  if (!session.mentorCharacter) {
+    modal.remove();
+    return;
+  }
+  modal.querySelector('.modal__body').innerHTML = mentorFeedbackHTML(session);
+  modal.querySelector('.modal__footer').innerHTML = `
+    <button class="btn btn--primary" data-close>${icon('check', 15)} <span>Entendido</span></button>`;
+  bindClose(modal);
+}
+
+function mentorFeedbackHTML(session) {
+  const header = `
+    <div class="mentor-feedback__header">
+      ${icon('sparkles', 18)}
+      <strong>${escapeHtml(session.mentorCharacter)}</strong>
+    </div>`;
+
+  if (session.mentorValid === false) {
+    return `
+      <div class="mentor-feedback mentor-feedback--invalid">
+        ${header}
+        <p class="mentor-feedback__message">${escapeHtml(session.mentorMessage || '')}</p>
+      </div>`;
+  }
+
+  return `
+    <div class="mentor-feedback">
+      ${header}
+      <p class="mentor-feedback__message">${escapeHtml(session.mentorMessage || '')}</p>
+      ${mentorSection('Por qué importa', session.mentorWhyItMatters)}
+      ${mentorSection('Aplicación real', session.mentorRealWorldUse)}
+      ${mentorSection('Reto práctico', session.mentorChallenge)}
+    </div>`;
+}
+
+function mentorSection(title, text) {
+  if (!text) return '';
+  return `
+    <div class="mentor-feedback__section">
+      <span class="mentor-feedback__label">${escapeHtml(title)}</span>
+      <p>${escapeHtml(text)}</p>
+    </div>`;
 }
 
 // DELETE --------------------------------------------------------------------
