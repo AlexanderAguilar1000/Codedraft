@@ -251,12 +251,15 @@ export function spinnerHTML(size = 24, label = 'Cargando…') {
 
 // Shared page header (icon + title + subtitle, optional right-side content
 // like an xp widget). Used by every view so the block isn't rebuilt per-page.
-export function pageHeader({ icon: iconName, title, subtitle, right = '' }) {
+export function pageHeader({ icon: iconName, title, subtitle, right = '', tone = 'teal' }) {
   return `
     <div class="page-head">
       <div class="page-head__left">
-        <h1>${icon(iconName, 22, 'page-icon')} ${title}</h1>
-        <p class="page-head__subtitle">${subtitle}</p>
+        <span class="page-icon-badge page-icon-badge--${tone}">${icon(iconName, 22)}</span>
+        <div>
+          <h1>${title}</h1>
+          <p class="page-head__subtitle">${subtitle}</p>
+        </div>
       </div>
       ${right}
     </div>

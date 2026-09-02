@@ -49,6 +49,7 @@ function pageHTML(state) {
       title: 'Mi perfil',
       subtitle: 'Configura tu rol, carrera e intereses para recibir recomendaciones personalizadas.',
       right: xpWidget,
+      tone: 'purple',
     })}
 
     ${isOnboarding ? `<div class="onboard-hero"><h1>¡Bienvenido a CodeCraftHub!</h1><p>Completa tu perfil para empezar a organizar y priorizar tus cursos de aprendizaje.</p></div>` : ''}

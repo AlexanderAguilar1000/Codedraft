@@ -9,7 +9,7 @@ import {
 } from '../services/api.js';
 import {
   icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel,
-  statusOptions, priorityOptions, tableSkeletonHTML, errBox, kpiCard,
+  statusOptions, priorityOptions, tableSkeletonHTML, errBox, kpiCard, pageHeader,
 } from '../utils/ui.js';
 import {
   openAddModal, openViewModal, openEditModal, openDeleteModal, openProgressModal,
@@ -19,13 +19,13 @@ let searchTimer = null;
 
 export async function renderCourses(root) {
   root.innerHTML = `
-    <div class="page-head">
-      <div class="page-head__left">
-        <h1>${icon('book', 22, 'page-icon')} Mis cursos</h1>
-        <p class="page-head__subtitle">Gestiona tu lista de cursos, añade nuevos y haz seguimiento de tu progreso.</p>
-      </div>
-      <button class="btn btn--primary" id="add-course-btn">${icon('plus', 15)} <span>Añadir curso</span></button>
-    </div>
+    ${pageHeader({
+      icon: 'book',
+      title: 'Mis cursos',
+      subtitle: 'Gestiona tu lista de cursos, añade nuevos y haz seguimiento de tu progreso.',
+      right: `<button class="btn btn--primary" id="add-course-btn">${icon('plus', 15)} <span>Añadir curso</span></button>`,
+      tone: 'blue',
+    })}
     <div id="courses-kpis" class="kpi-grid"></div>
     <div class="card">
       <div class="card__header"><span class="card__title">Lista de cursos</span><span class="result-count" id="courses-count"></span></div>
@@ -132,7 +132,7 @@ function renderTable(root, courses) {
 function rowHTML(c) {
   return `<tr data-course-id="${c.id}">
     <td><div class="col-name">${escapeHtml(c.name)}</div><div class="col-desc">${escapeHtml(c.description || 'Sin descripción')}</div></td>
-    <td><select class="inline-select" data-priority-select="${c.id}" data-original="${c.priority}">
+    <td><select class="inline-select ${priorityToneClass(c.priority)}" data-priority-select="${c.id}" data-original="${c.priority}">
       ${priorityOptions().map((o) => `<option value="${o.value}" ${o.value === c.priority ? 'selected' : ''}>${o.label}</option>`).join('')}
     </select></td>
     <td><input type="date" class="inline-select" data-date-input="${c.id}" value="${c.targetDate || ''}" /></td>
@@ -143,13 +143,17 @@ function rowHTML(c) {
       </div>
     </td>
     <td class="col-actions">
-      <button class="action-btn action-btn--progress" data-progress="${c.id}" title="Registrar progreso" aria-label="Registrar progreso">${icon('trending', 15)}</button>
-      <button class="action-btn action-btn--view" data-view="${c.id}" title="Ver detalle" aria-label="Ver">${icon('eye', 15)}</button>
-      <button class="action-btn action-btn--edit" data-edit="${c.id}" title="Editar" aria-label="Editar">${icon('edit', 15)}</button>
-      <button class="action-btn action-btn--delete" data-delete="${c.id}" title="Eliminar" aria-label="Eliminar">${icon('trash', 15)}</button>
+      <div class="action-group">
+        <button class="action-btn action-btn--progress" data-progress="${c.id}" title="Registrar progreso" aria-label="Registrar progreso">${icon('trending', 15)}</button>
+        <button class="action-btn action-btn--view" data-view="${c.id}" title="Ver detalle" aria-label="Ver">${icon('eye', 15)}</button>
+        <button class="action-btn action-btn--edit" data-edit="${c.id}" title="Editar" aria-label="Editar">${icon('edit', 15)}</button>
+        <button class="action-btn action-btn--delete" data-delete="${c.id}" title="Eliminar" aria-label="Eliminar">${icon('trash', 15)}</button>
+      </div>
     </td>
   </tr>`;
 }
+
+function priorityToneClass(p) { return { ALTA: 'inline-select--high', MEDIA: 'inline-select--medium', BAJA: 'inline-select--low' }[p] || ''; }
 
 function bindPrioritySelect(sel) {
   sel.addEventListener('change', async () => {
@@ -159,6 +163,9 @@ function bindPrioritySelect(sel) {
       const updated = await updateCoursePriority(id, sel.value);
       updateRowInState(updated);
       refreshRow(sel, updated);
+      sel.classList.remove('inline-select--high', 'inline-select--medium', 'inline-select--low');
+      sel.classList.add(priorityToneClass(updated.priority));
+      sel.dataset.original = updated.priority;
       showToast('Prioridad actualizada.', 'success');
     } catch (err) {
       sel.value = sel.dataset.original;

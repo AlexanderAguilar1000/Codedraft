@@ -3,17 +3,17 @@
 
 import { getState, setLoading } from '../state/store.js';
 import { getSuggestedCourses } from '../services/api.js';
-import { icon, showToast, escapeHtml, spinnerHTML, progressRing } from '../utils/ui.js';
+import { icon, showToast, escapeHtml, spinnerHTML, progressRing, pageHeader } from '../utils/ui.js';
 import { openAddSuggestedModal } from './courseModals.js';
 
 export async function renderSuggested(root) {
   root.innerHTML = `
-    <div class="page-head">
-      <div class="page-head__left">
-        <h1>${icon('sparkles', 22, 'page-icon')} Cursos sugeridos</h1>
-        <p class="page-head__subtitle">Recomendaciones personalizadas según tu perfil, rol e intereses.</p>
-      </div>
-    </div>
+    ${pageHeader({
+      icon: 'sparkles',
+      title: 'Cursos sugeridos',
+      subtitle: 'Recomendaciones personalizadas según tu perfil, rol e intereses.',
+      tone: 'gold',
+    })}
     <div id="suggested-content"><div class="loading-overlay">${spinnerHTML(26, 'Buscando cursos para ti…')}</div></div>
   `;
   const content = root.querySelector('#suggested-content');

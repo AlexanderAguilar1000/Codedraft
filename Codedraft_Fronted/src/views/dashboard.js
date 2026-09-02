@@ -13,7 +13,7 @@ import { navigate } from '../router.js';
 
 export async function renderDashboard(root) {
   root.innerHTML = `
-    ${pageHeader({ icon: 'dashboard', title: 'Dashboard', subtitle: 'Tu progreso de aprendizaje de un vistazo.' })}
+    ${pageHeader({ icon: 'dashboard', title: 'Dashboard', subtitle: 'Tu progreso de aprendizaje de un vistazo.', tone: 'teal' })}
     <div id="dash-content"><div class="loading-overlay">${spinnerHTML(26, 'Cargando tu dashboard…')}</div></div>
   `;
 
@@ -73,7 +73,7 @@ function dashboardHTML(state, recommendation) {
              <div class="rec-card__cta"><button class="btn btn--primary btn--block" data-action="go-courses">${icon('arrowRight', 15)} Ir a mis cursos</button></div>`
           : `<div class="rec-card__name">¡Todo al día!</div>
              <div class="rec-card__desc">No tienes cursos pendientes. Agrega uno nuevo o explora las sugerencias.</div>
-             <div class="rec-card__cta"><button class="btn btn--secondary btn--block" data-action="go-suggested">${icon('sparkles', 15)} Ver cursos sugeridos</button></div>`}
+             <div class="rec-card__cta"><button class="btn btn--primary btn--block" data-action="go-suggested">${icon('sparkles', 15)} Ver cursos sugeridos</button></div>`}
       </div>
     </div>
 
