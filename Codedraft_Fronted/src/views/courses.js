@@ -9,7 +9,7 @@ import {
 } from '../services/api.js';
 import {
   icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel,
-  statusOptions, priorityOptions, tableSkeletonHTML,
+  statusOptions, priorityOptions, tableSkeletonHTML, errBox, kpiCard,
 } from '../utils/ui.js';
 import {
   openAddModal, openViewModal, openEditModal, openDeleteModal, openProgressModal,
@@ -82,16 +82,17 @@ export async function refreshCourses() {
 }
 
 function renderKPIs(root, stats) {
+  const total = stats.totalCourses ?? 0;
   root.querySelector('#courses-kpis').innerHTML = `
-    ${miniKPI('Total', stats.totalCourses ?? 0, 'book', 'primary')}
-    ${miniKPI('En curso', stats.inProgress ?? 0, 'clock', 'warning')}
-    ${miniKPI('Completados', stats.completed ?? 0, 'check', 'success')}
-    ${miniKPI('No iniciados', stats.notStarted ?? 0, 'target', 'neutral')}
+    ${kpiCard({ label: 'Total', value: total, ic: 'book', tone: 'primary', note: 'Cursos registrados' })}
+    ${kpiCard({ label: 'En curso', value: stats.inProgress ?? 0, ic: 'clock', tone: 'warning', pct: sharePct(stats.inProgress, total) })}
+    ${kpiCard({ label: 'Completados', value: stats.completed ?? 0, ic: 'check', tone: 'success', pct: sharePct(stats.completed, total) })}
+    ${kpiCard({ label: 'No iniciados', value: stats.notStarted ?? 0, ic: 'target', tone: 'neutral', pct: sharePct(stats.notStarted, total) })}
   `;
 }
-function miniKPI(label, value, ic, tone) {
-  return `<div class="kpi"><div class="kpi__top"><span class="kpi__icon kpi__icon--${tone}">${icon(ic, 18)}</span></div><div class="kpi__value">${value}</div><div class="kpi__label">${label}</div></div>`;
-}
+// Share of the total courses this count represents (0-100). Real, derived
+// from data already fetched — not a fabricated time-based trend.
+function sharePct(n, total) { return total ? Math.round(((n ?? 0) / total) * 100) : 0; }
 
 function renderTable(root, courses) {
   const tbody = root.querySelector('#courses-tbody');
@@ -223,8 +224,4 @@ async function applyFilters(root) {
     tbody.innerHTML = `<tr><td colspan="5">${errBox('Error en la búsqueda', err.message)}</td></tr>`;
     showToast(err.message || 'Error al filtrar.', 'error');
   }
-}
-
-function errBox(title, msg) {
-  return `<div class="empty-state"><div class="empty-state__icon">${icon('close', 26)}</div><h3>${title}</h3><p>${escapeHtml(msg || 'Intenta de nuevo.')}</p></div>`;
 }

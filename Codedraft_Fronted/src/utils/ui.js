@@ -213,6 +213,37 @@ export function tableSkeletonHTML(columns) {
     .join('');
 }
 
+// Decorative sparkline wave shapes for KPI cards (not tied to real historical
+// data — the app has no time-series storage for stats yet). Kept as a fixed,
+// small set so each tone always renders the same shape.
+const KPI_SPARK_PATHS = [
+  'M0 24 C10 8,20 8,30 20 C40 32,50 6,60 18 C70 30,80 10,90 22 C100 30,110 14,120 20',
+  'M0 20 C12 30,24 4,36 18 C48 32,60 10,72 22 C84 30,96 12,108 20 L120 18',
+  'M0 22 C15 6,30 30,45 16 C60 4,75 28,90 14 C100 6,110 20,120 16',
+  'M0 18 C10 26,20 10,30 20 C45 34,55 4,70 18 C85 30,95 8,110 20 C115 24,118 18,120 20',
+];
+const KPI_TONE_SPARK_INDEX = { primary: 0, success: 1, warning: 2, accent: 3, neutral: 0 };
+
+// Shared KPI stat card: icon badge + colored label, big value, a trend row
+// and a decorative sparkline. Pass `pct` (0-100, share of a total) to show
+// an up-arrow badge; pass `note` instead for a value that's already a
+// percentage or otherwise has no meaningful "share of total".
+export function kpiCard({ label, value, ic, tone, action = '', pct = null, note = '' }) {
+  const trend = pct != null
+    ? `<span class="kpi__trend-badge">${icon('trending', 11)} ${pct}%</span><span class="kpi__trend-note">del total</span>`
+    : `<span class="kpi__trend-note">${note}</span>`;
+  const sparkD = KPI_SPARK_PATHS[KPI_TONE_SPARK_INDEX[tone] ?? 0];
+  return `<div class="kpi kpi--${tone}${action ? ' kpi--clickable' : ''}"${action ? ` data-action="${action}"` : ''}>
+    <div class="kpi__head">
+      <span class="kpi__icon">${icon(ic, 18)}</span>
+      <span class="kpi__label">${label}</span>
+    </div>
+    <div class="kpi__value">${value}</div>
+    <div class="kpi__trend">${trend}</div>
+    <svg class="kpi__spark" viewBox="0 0 120 34" preserveAspectRatio="none"><path d="${sparkD}"/></svg>
+  </div>`;
+}
+
 // A generic content spinner.
 export function spinnerHTML(size = 24, label = 'Cargando…') {
   return `<div class="spinner-wrap"><span class="spinner" style="width:${size}px;height:${size}px"></span><span class="spinner__label">${escapeHtml(label)}</span></div>`;

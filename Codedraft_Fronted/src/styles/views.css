@@ -86,23 +86,63 @@
 .kpi {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-xl);
   padding: var(--s-5);
+  overflow: hidden;
   transition: transform var(--dur) var(--ease), border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), background-color var(--dur-slow) var(--ease);
 }
 .kpi:hover { transform: translateY(-2px); border-color: var(--border-mid); box-shadow: var(--shadow-hover); }
-.kpi__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-3); }
-.kpi__icon { width: 36px; height: 36px; border-radius: var(--r-md); display: grid; place-items: center; }
-.kpi__icon svg { width: 18px; height: 18px; }
-.kpi__icon--primary { background: var(--teal-subtle); color: var(--teal); }
-.kpi__icon--success { background: var(--success-bg); color: var(--success); }
-.kpi__icon--warning { background: var(--warning-bg); color: var(--warning); }
-.kpi__icon--neutral  { background: var(--overlay-hover); color: var(--text-muted); }
-.kpi__icon--accent   { background: var(--danger-bg); color: var(--priority-high); }
-.kpi__value { font-size: 1.7rem; font-weight: 800; line-height: 1; color: var(--heading); font-variant-numeric: tabular-nums; }
-.kpi__label { font-size: 0.78rem; color: var(--text-muted); margin-top: var(--s-1); }
 .kpi--clickable { cursor: pointer; }
 .kpi--clickable:hover { border-color: var(--teal); }
+
+/* Head row: icon badge + colored label */
+.kpi__head { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-4); }
+.kpi__icon {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.kpi__icon svg { width: 18px; height: 18px; }
+.kpi__label { font-size: 0.82rem; font-weight: 600; }
+
+.kpi__value { font-size: 1.9rem; font-weight: 800; line-height: 1; color: var(--heading); font-variant-numeric: tabular-nums; margin-bottom: var(--s-3); }
+
+/* Trend row: colored share badge (or a plain note) + muted caption */
+.kpi__trend { display: flex; align-items: center; gap: 6px; font-size: 0.76rem; margin-bottom: var(--s-4); min-height: 1em; }
+.kpi__trend-badge { display: inline-flex; align-items: center; gap: 3px; font-weight: 700; }
+.kpi__trend-badge svg { width: 11px; height: 11px; }
+.kpi__trend-note { color: var(--text-muted); }
+
+/* Decorative sparkline strip, bleeding to the card edges */
+.kpi__spark {
+  display: block;
+  width: calc(100% + var(--s-5) * 2);
+  height: 34px;
+  margin: 0 calc(var(--s-5) * -1) calc(var(--s-5) * -1);
+}
+.kpi__spark path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+
+/* Tone accents */
+.kpi--primary .kpi__icon { background: var(--teal-subtle); color: var(--teal); }
+.kpi--primary .kpi__label, .kpi--primary .kpi__trend-badge { color: var(--teal); }
+.kpi--primary .kpi__spark path { stroke: var(--teal); }
+
+.kpi--success .kpi__icon { background: var(--success-bg); color: var(--success); }
+.kpi--success .kpi__label, .kpi--success .kpi__trend-badge { color: var(--success); }
+.kpi--success .kpi__spark path { stroke: var(--success); }
+
+.kpi--warning .kpi__icon { background: var(--warning-bg); color: var(--warning); }
+.kpi--warning .kpi__label, .kpi--warning .kpi__trend-badge { color: var(--warning); }
+.kpi--warning .kpi__spark path { stroke: var(--warning); }
+
+.kpi--neutral .kpi__icon { background: var(--overlay-hover); color: var(--text-muted); }
+.kpi--neutral .kpi__label, .kpi--neutral .kpi__trend-badge { color: var(--text-soft); }
+.kpi--neutral .kpi__spark path { stroke: var(--text-muted); }
+
+.kpi--accent .kpi__icon { background: var(--danger-bg); color: var(--priority-high); }
+.kpi--accent .kpi__label, .kpi--accent .kpi__trend-badge { color: var(--priority-high); }
+.kpi--accent .kpi__spark path { stroke: var(--priority-high); }
 
 .dash-grid {
   display: grid;
@@ -198,11 +238,11 @@
 .catalog-card__add {
   position: absolute; top: var(--s-4); right: var(--s-4);
   width: 30px; height: 30px; border-radius: 50%;
-  background: var(--bg-elevated); border: 1px solid var(--border-mid);
-  display: grid; place-items: center; color: var(--text-muted);
+  background: var(--teal); border: 1px solid var(--teal);
+  display: grid; place-items: center; color: var(--on-accent);
   transition: all var(--dur) var(--ease);
 }
-.catalog-card__add:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-subtle); }
+.catalog-card__add:hover { background: var(--teal-hover); box-shadow: var(--shadow-teal); }
 .catalog-card__add svg { width: 14px; height: 14px; }
 
 /* Tag pill row (flat single pill like photo) */

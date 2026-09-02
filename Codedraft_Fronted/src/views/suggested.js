@@ -70,7 +70,7 @@ function featuredCardHTML(course, maxScore, idx) {
         </div>
         <div class="catalog-card__roles" style="margin-bottom:var(--s-4)">Para: ${(course.roles || []).slice(0, 3).map(escapeHtml).join(' · ')}</div>
         <div style="margin-top:auto">
-          <button class="btn btn--primary" data-add-suggested="${idx}">${icon('plus', 15)} Añadir a mis cursos</button>
+          <button class="btn btn--success" data-add-suggested="${idx}">${icon('plus', 15)} Añadir a mis cursos</button>
         </div>
       </div>
       <div class="catalog-card__visual">
@@ -96,7 +96,7 @@ function cardHTML(course, maxScore, idx) {
       </div>
       <div class="catalog-card__roles">Para: ${(course.roles || []).slice(0, 3).map(escapeHtml).join(', ')}</div>
       <div class="catalog-card__cta">
-        <button class="btn btn--secondary btn--block btn--sm" data-add-suggested="${idx}">${icon('plus', 14)} Añadir a mis cursos</button>
+        <button class="btn btn--success btn--block btn--sm" data-add-suggested="${idx}">${icon('plus', 14)} Añadir a mis cursos</button>
       </div>
     </article>
   `;

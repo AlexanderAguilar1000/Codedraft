@@ -538,6 +538,12 @@ body::after {
   border-color: var(--border-mid);
 }
 .btn--secondary:hover:not(:disabled) { border-color: var(--border-strong); background: var(--overlay-hover); }
+.btn--success {
+  background: var(--teal);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+.btn--success:hover:not(:disabled) { background: var(--teal-hover); box-shadow: var(--shadow-teal); transform: translateY(-1px); }
 .btn--ghost { color: var(--text-muted); }
 .btn--ghost:hover { color: var(--text); background: var(--overlay-hover); }
 .btn--danger { background: var(--danger-bg); color: var(--danger); border-color: rgba(255,92,92,0.2); }

@@ -7,7 +7,7 @@ import {
   getExperiencePoints, getCourseStats, getRecommendedCourse,
   getCourses, getSuggestedCourses,
 } from '../services/api.js';
-import { icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel, spinnerHTML, pageHeader, emptyBox, errBox } from '../utils/ui.js';
+import { icon, showToast, escapeHtml, formatDate, statusLabel, priorityLabel, spinnerHTML, pageHeader, emptyBox, errBox, kpiCard } from '../utils/ui.js';
 import { computeLevel, getStudyStreak } from '../utils/gamification.js';
 import { navigate } from '../router.js';
 
@@ -78,12 +78,12 @@ function dashboardHTML(state, recommendation) {
     </div>
 
     <div class="kpi-grid">
-      ${kpi('Total cursos', stats.totalCourses ?? 0, 'book', 'primary')}
-      ${kpi('En curso', stats.inProgress ?? 0, 'clock', 'warning')}
-      ${kpi('Completados', stats.completed ?? 0, 'check', 'success')}
-      ${kpi('No iniciados', stats.notStarted ?? 0, 'target', 'neutral')}
-      ${kpi('Prioridad alta', stats.highPriority ?? 0, 'flame', 'accent')}
-      ${kpi('Progreso medio', `${stats.averageProgress ?? 0}%`, 'trending', 'primary')}
+      ${kpiCard({ label: 'Total cursos', value: stats.totalCourses ?? 0, ic: 'book', tone: 'primary', action: 'go-courses', note: 'Cursos registrados' })}
+      ${kpiCard({ label: 'En curso', value: stats.inProgress ?? 0, ic: 'clock', tone: 'warning', action: 'go-courses', pct: sharePct(stats.inProgress, stats.totalCourses) })}
+      ${kpiCard({ label: 'Completados', value: stats.completed ?? 0, ic: 'check', tone: 'success', action: 'go-courses', pct: sharePct(stats.completed, stats.totalCourses) })}
+      ${kpiCard({ label: 'No iniciados', value: stats.notStarted ?? 0, ic: 'target', tone: 'neutral', action: 'go-courses', pct: sharePct(stats.notStarted, stats.totalCourses) })}
+      ${kpiCard({ label: 'Prioridad alta', value: stats.highPriority ?? 0, ic: 'flame', tone: 'accent', action: 'go-courses', pct: sharePct(stats.highPriority, stats.totalCourses) })}
+      ${kpiCard({ label: 'Progreso medio', value: `${stats.averageProgress ?? 0}%`, ic: 'trending', tone: 'primary', action: 'go-courses', note: 'Promedio de tus cursos' })}
     </div>
 
     <div class="dash-grid">
@@ -121,12 +121,9 @@ function miniItem(c) {
   </div>`;
 }
 
-function kpi(label, value, ic, tone) {
-  return `<div class="kpi kpi--clickable" data-action="go-courses">
-    <div class="kpi__top"><span class="kpi__icon kpi__icon--${tone}">${icon(ic, 18)}</span></div>
-    <div class="kpi__value">${value}</div><div class="kpi__label">${label}</div>
-  </div>`;
-}
+// Share of the total courses this count represents (0-100). Real, derived
+// from data already fetched — not a fabricated time-based trend.
+function sharePct(n, total) { return total ? Math.round(((n ?? 0) / total) * 100) : 0; }
 
 function priorityBadgeClass(p) { return { ALTA: 'badge--high', MEDIA: 'badge--medium', BAJA: 'badge--low' }[p] || 'badge--neutral'; }
 
