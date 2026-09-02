@@ -599,14 +599,18 @@ body::after {
   flex-shrink: 0;
 }
 .action-btn--progress { background: var(--success); }
-.action-btn--progress:hover { background: var(--success); filter: brightness(1.1); }
 .action-btn--view { background: var(--info); }
-.action-btn--view:hover { background: var(--info); filter: brightness(1.1); }
 .action-btn--edit { background: var(--teal); }
-.action-btn--edit:hover { background: var(--teal); filter: brightness(1.1); }
 .action-btn--delete { background: var(--danger); }
-.action-btn--delete:hover { background: var(--danger); filter: brightness(1.1); }
+.action-btn:hover { filter: brightness(1.1); }
 .action-btn svg { width: 15px; height: 15px; }
+
+/* Dark theme: the pastel semantic colors read as pale/washed out when used
+   as solid button fills, so use richer, more saturated tones instead. */
+[data-theme="dark"] .action-btn--progress { background: #16a34a; }
+[data-theme="dark"] .action-btn--view     { background: #2563eb; }
+[data-theme="dark"] .action-btn--edit     { background: #0e9f76; }
+[data-theme="dark"] .action-btn--delete   { background: #dc2626; }
 
 /* Badges / chips
    -------------------------------------------------------------------------- */
@@ -759,7 +763,7 @@ table.data-table tbody td {
 table.data-table tbody tr:last-child td { border-bottom: none; }
 .col-name { font-weight: 600; color: var(--heading); }
 .col-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; max-width: 280px; }
-.col-actions { text-align: right; white-space: nowrap; }
+.col-actions { text-align: center; white-space: nowrap; }
 
 /* Action buttons row */
 .action-group {
