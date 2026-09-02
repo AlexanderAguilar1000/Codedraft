@@ -32,16 +32,15 @@ export async function renderCourses(root) {
       <div class="card__body" style="padding:var(--s-5)">
         <div class="courses-toolbar">
           <div class="search-input">${icon('search', 15)}<input type="search" id="search-name" placeholder="Buscar por nombre…" /></div>
-          <select id="filter-status" class="filter-select">
-            <option value="">Todos los estados</option>
-            ${statusOptions().map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
-          </select>
-          <select id="filter-priority" class="filter-select">
-            <option value="">Todas las prioridades</option>
-            ${priorityOptions().map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
-          </select>
           <div class="courses-toolbar__right">
-            <button class="btn btn--ghost btn--sm" id="clear-filters">${icon('close', 13)} Limpiar</button>
+            <select id="filter-status" class="filter-select">
+              <option value="">Todos los estados</option>
+              ${statusOptions().map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
+            </select>
+            <select id="filter-priority" class="filter-select">
+              <option value="">Todas las prioridades</option>
+              ${priorityOptions().map((o) => `<option value="${o.value}">${o.label}</option>`).join('')}
+            </select>
           </div>
         </div>
         <div class="table-wrap">
@@ -206,11 +205,9 @@ function bindToolbar(root) {
   const nameInput = root.querySelector('#search-name');
   const statusSel = root.querySelector('#filter-status');
   const prioritySel = root.querySelector('#filter-priority');
-  const clearBtn = root.querySelector('#clear-filters');
   nameInput.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => applyFilters(root), 300); });
   statusSel.addEventListener('change', () => applyFilters(root));
   prioritySel.addEventListener('change', () => applyFilters(root));
-  clearBtn.addEventListener('click', () => { nameInput.value = ''; statusSel.value = ''; prioritySel.value = ''; applyFilters(root); });
 }
 
 async function applyFilters(root) {

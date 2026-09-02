@@ -589,24 +589,23 @@ body::after {
 .btn--add:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-subtle); }
 .btn--add svg { width: 16px; height: 16px; }
 
-/* Action icon buttons (table) */
+/* Action icon buttons (table) — filled color squares */
 .action-btn {
   width: 30px; height: 30px;
   border-radius: var(--r-sm);
   display: inline-grid; place-items: center;
-  color: var(--text-muted);
+  color: #fff;
   transition: all var(--dur) var(--ease);
   flex-shrink: 0;
 }
-.action-btn:hover { background: var(--bg-elevated); color: var(--text); }
-.action-btn--progress        { color: var(--success); }
-.action-btn--progress:hover  { color: var(--success); background: var(--success-bg); }
-.action-btn--view        { color: var(--info); }
-.action-btn--view:hover  { color: var(--info); background: var(--info-bg); }
-.action-btn--edit        { color: var(--teal); }
-.action-btn--edit:hover  { color: var(--teal); background: var(--teal-subtle); }
-.action-btn--delete        { color: var(--danger); }
-.action-btn--delete:hover{ color: var(--danger); background: var(--danger-bg); }
+.action-btn--progress { background: var(--success); }
+.action-btn--progress:hover { background: var(--success); filter: brightness(1.1); }
+.action-btn--view { background: var(--info); }
+.action-btn--view:hover { background: var(--info); filter: brightness(1.1); }
+.action-btn--edit { background: var(--teal); }
+.action-btn--edit:hover { background: var(--teal); filter: brightness(1.1); }
+.action-btn--delete { background: var(--danger); }
+.action-btn--delete:hover { background: var(--danger); filter: brightness(1.1); }
 .action-btn svg { width: 15px; height: 15px; }
 
 /* Badges / chips
@@ -758,19 +757,13 @@ table.data-table tbody td {
   color: var(--text);
 }
 table.data-table tbody tr:last-child td { border-bottom: none; }
-table.data-table tbody tr { transition: background var(--dur) var(--ease); }
-table.data-table tbody tr:nth-child(even) { background: var(--overlay-row); }
-table.data-table tbody tr:hover { background: var(--overlay-hover); }
 .col-name { font-weight: 600; color: var(--heading); }
 .col-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; max-width: 280px; }
 .col-actions { text-align: right; white-space: nowrap; }
 
-/* Grouped action buttons */
+/* Action buttons row */
 .action-group {
-  display: inline-flex; align-items: center; gap: 2px;
-  padding: 3px;
-  border-radius: var(--r-md);
-  background: var(--bg-elevated);
+  display: inline-flex; align-items: center; gap: var(--s-2);
 }
 
 /* Inline table select (status / priority) */
