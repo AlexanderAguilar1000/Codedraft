@@ -4,7 +4,7 @@ Basado en el [Documento de Historias de Usuario](./user_stories.md) y en el stac
 
 - **Frontend:** HTML, CSS, JavaScript (interfaz generada con Bolt.new o Bolt.diy).
 - **Backend:** Spring Boot + Spring Web + Jackson, **sin base de datos** — persistencia en archivos JSON.
-- **IA:** Python + Flask (perfil de aprendizaje, recomendaciones y mensajes del coach).
+- **IA:** Python + Flask + Groq (feedback del Mentor sobre sesiones de estudio; perfil de aprendizaje pendiente). Las recomendaciones de cursos **no** son responsabilidad de la IA — las calcula el algoritmo de puntuación de Spring Boot (sección 6).
 
 **Leyenda de capa:** BE = Backend (Spring Boot) · FE = Frontend (HTML/CSS/JS) · IA = Servicio Python/Flask
 
@@ -74,7 +74,7 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 ### Estructuras del servicio de IA (no persistidas, solo request/response)
 
 ```json
-// POST /learning-profile -> response
+// POST /learning-profile -> response (PENDIENTE, ver sección 8.4 — no implementado todavía)
 {
   "summary": "string",
   "recommendedFocus": ["string"]
@@ -82,12 +82,28 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 ```
 
 ```json
-// POST /coach-message -> response
+// POST /coach-message -> request (implementado)
 {
-  "character": "Mentor Backend",
-  "message": "string"
+  "user": { "rol": "string", "carrera": "string", "intereses": ["string"] },
+  "course": { "name": "string", "description": "string" },
+  "progress": 0,
+  "studySession": { "durationMinutes": 0, "notes": "string" }
 }
 ```
+
+```json
+// POST /coach-message -> response (implementado; reemplaza el shape antiguo {character, message})
+{
+  "character": "Mentor CodeDraft",
+  "valid": true,
+  "message": "string",
+  "whyItMatters": "string | null",
+  "realWorldUse": "string | null",
+  "challenge": "string | null"
+}
+```
+
+> El personaje ya no es "Mentor Backend" fijo: es "Mentor CodeDraft", un mentor único que adapta el ángulo de su explicación al `rol` del estudiante (backend, frontend, DevOps, etc.), no solo a backend. Ver sección 8.
 
 ---
 
@@ -113,15 +129,17 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 | GET | `/api/courses/stats` | Obtener estadísticas de los cursos (total, por estado, por prioridad, promedio de progreso). |
 | GET | `/api/courses/recommendation` | Obtener el siguiente curso recomendado. |
 | GET | `/api/courses/suggested` | Obtener cursos sugeridos del catálogo según el perfil. |
-| POST | `/api/study-sessions` | Registrar una sesión de estudio: avanza el progreso del curso y otorga experiencia al perfil según la duración. |
+| POST | `/api/study-sessions` | Registrar una sesión de estudio: avanza el progreso del curso, otorga experiencia al perfil según la duración, y devuelve embebido el feedback del Mentor IA (`mentorCharacter`, `mentorValid`, `mentorMessage`, `mentorWhyItMatters`, `mentorRealWorldUse`, `mentorChallenge`). Si el servicio de IA no responde, la sesión se guarda igual y esos campos quedan en `null`. |
 
-### Servicio de IA (Flask)
+> No existe un endpoint público adicional en Spring Boot para pedir el feedback del mentor por separado: viaja embebido en la respuesta de `POST /api/study-sessions` (decisión de diseño, ver sección 8.2). `IA_Message/controller/IA_Controller.java` sigue vacío/sin uso por esa razón — queda reservado para cuando se implemente `/learning-profile` del lado de Spring Boot.
 
-| Método | Endpoint | Descripción |
-|--------|----------|--------------|
-| GET | `/health` | Verificar disponibilidad del servicio. |
-| POST | `/learning-profile` | Generar el perfil de aprendizaje a partir de rol, carrera e intereses. |
-| POST | `/coach-message` | Generar el mensaje motivador del coach según el progreso. |
+### Servicio de IA (Flask) — proyecto separado `ai-service/` (Python + Flask + Groq)
+
+| Método | Endpoint | Estado | Descripción |
+|--------|----------|--------|--------------|
+| GET | `/health` | ✅ Implementado | Verificar disponibilidad del servicio. |
+| POST | `/coach-message` | ✅ Implementado | Analiza `notes`, valida si describe un aprendizaje real, y si es válido genera feedback + importancia + aplicación real + reto, adaptado al `rol` del estudiante. Ver sección 8. |
+| POST | `/learning-profile` | ⏳ Pendiente | Generar el perfil de aprendizaje a partir de rol, carrera e intereses. Analizado (costo/beneficio) pero no implementado — ver sección 8.4. |
 
 ---
 
@@ -240,28 +258,37 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 
 | ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
 |----|-------|------|-----------|---------------|---------------------------|
-| TT-028 | Inicializar el servicio Flask con endpoint de salud (`GET /health`) | IA | Media | — | Responde 200 cuando el servicio está disponible. |
-| TT-029 | Desarrollar endpoint Flask para generar el perfil de aprendizaje (`POST /learning-profile`) | IA | Media | TT-028 | Recibe rol, carrera e intereses y retorna un perfil de aprendizaje en JSON. |
-| TT-030 | Integrar la llamada desde Spring Boot al servicio Flask | BE | Media | TT-002, TT-029 | Al guardar el perfil se invoca `/learning-profile`; si el servicio de IA no responde, el registro del perfil no se bloquea. |
+| TT-028 | Inicializar el servicio Flask con endpoint de salud (`GET /health`) | IA | Media | — | ✅ Responde 200 cuando el servicio está disponible. |
+| TT-029 | Desarrollar endpoint Flask para generar el perfil de aprendizaje (`POST /learning-profile`) | IA | Media | TT-028 | ⏳ Pendiente. Recibe rol, carrera e intereses y retorna un perfil de aprendizaje en JSON. Se analizó el costo/beneficio (ver sección 8.4): bajo costo (se llamaría una sola vez, al registrar el perfil) pero valor decorativo, sin lugar aún en la UI para mostrarlo — se decidió priorizar primero `/coach-message`. |
+| TT-030 | Integrar la llamada desde Spring Boot al servicio Flask | BE | Media | TT-002, TT-029 | ⏳ Pendiente (depende de TT-029). Al guardar el perfil se invocaría `/learning-profile`; si el servicio de IA no responde, el registro del perfil no debe bloquearse (mismo patrón fail-open que `CoachAiClient`, ver sección 8.3). |
 
 ---
 
 ### HU-013 Recibir mensajes motivadores del coach
 
+> El diseño original de esta historia (coach enganchado a `PATCH /api/courses/{id}/progress`, con un mensaje corto tipo toast) cambió durante la implementación: el feedback de IA quedó ligado al registro de la **sesión de estudio** (`POST /api/study-sessions`, HU-016), no a la corrección manual de progreso, y el contenido pasó de "mensaje motivador breve" a un análisis real de lo que el estudiante escribió (`notes`), con validación semántica y contenido estructurado. Ver sección 8 para el detalle completo.
+
 | ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
 |----|-------|------|-----------|---------------|---------------------------|
-| TT-031 | Desarrollar endpoint Flask para el mensaje motivador (`POST /coach-message`) | IA | Media | TT-028 | Recibe el progreso actualizado y retorna un mensaje breve en JSON. |
-| TT-032 | Integrar la llamada al coach desde el endpoint de progreso | BE | Media | TT-017, TT-031 | La respuesta de `PATCH /api/courses/{id}/progress` incluye el mensaje del coach cuando el servicio de IA responde correctamente. |
-| TT-033 | Mostrar el mensaje del coach en la interfaz tras actualizar el progreso | FE | Media | TT-018, TT-032 | Aparece un mensaje/toast motivador inmediatamente después de guardar el progreso. |
+| ~~TT-031~~ | ~~Desarrollar endpoint Flask para el mensaje motivador (`POST /coach-message`)~~ | IA | Media | TT-028 | **Reemplazada por TT-045.** El endpoint sí recibe el nombre `/coach-message`, pero ya no recibe "el progreso actualizado" para devolver un mensaje corto: recibe perfil + curso + progreso + `notes`, valida si `notes` describe un aprendizaje real, y solo si es válido genera feedback + importancia + aplicación real + reto. |
+| ~~TT-032~~ | ~~Integrar la llamada al coach desde el endpoint de progreso~~ | BE | Media | TT-017, TT-031 | **Reemplazada por TT-047.** El punto de integración ya no es `PATCH /api/courses/{id}/progress`: es `POST /api/study-sessions` (HU-016), porque ahí es donde existe `notes` para analizar. |
+| ~~TT-033~~ | ~~Mostrar el mensaje del coach en la interfaz tras actualizar el progreso~~ | FE | Media | TT-018, TT-032 | **Reemplazada por TT-048.** No es un toast: el feedback se muestra dentro del mismo modal "Registrar progreso", reemplazando el formulario, con secciones separadas (mensaje, por qué importa, aplicación real, reto). |
+| TT-045 | Desarrollar el servicio Flask completo de `POST /coach-message` (`ai-service/app.py`): validación semántica de `notes`, generación de feedback estructurado, reintento si el LLM devuelve JSON inválido | IA | Alta | TT-028 | ✅ Responde `valid:false` con mensaje pidiendo mejor descripción si `notes` no describe un aprendizaje (vacío, sin sentido, no relacionado); responde `valid:true` con `message`/`whyItMatters`/`realWorldUse`/`challenge` si sí lo describe, aunque sea breve o general; reintenta una vez si el LLM no devuelve JSON válido antes de fallar con 502. |
+| TT-046 | Desarrollar el cliente HTTP en Spring Boot hacia el servicio de IA (`CoachAiClient`, paquete `IA_Message`) | BE | Alta | TT-045 | ✅ Usa `RestClient` con timeouts de conexión/lectura configurables (`app.ai-service.*` en `application.properties`); nunca propaga excepciones — cualquier fallo de Flask (timeout, conexión, error HTTP) se loguea y devuelve `Optional.empty()`. |
+| TT-047 | Integrar `CoachAiClient` en `StudySessionService.registerSession()` y persistir/exponer el feedback del mentor | BE | Alta | TT-041, TT-046 | ✅ Después de calcular progreso y XP, se arma el contexto (perfil + curso + progreso + notas) y se llama a `CoachAiClient`; el resultado (o `null` si la IA falló) se persiste en `StudySession` (`study_sessions.json`) y se expone en `StudySessionResponse` — el registro de la sesión nunca falla por culpa de la IA. |
+| TT-048 | Mostrar el feedback del mentor en el modal "Registrar progreso" del frontend | FE | Alta | TT-044, TT-047 | ✅ Al recibir la respuesta de `POST /api/study-sessions`, si trae `mentorCharacter`, el modal reemplaza el formulario por el feedback (o solo el mensaje, si `mentorValid=false`) con un botón "Entendido"; si no trae `mentorCharacter` (IA no disponible), el modal se cierra igual que antes de este cambio. |
 
 ---
 
 ### HU-014 Interactuar con el personaje del coach
 
+> El diseño original planteaba un personaje fijo "Mentor Backend" con avatar gráfico. Durante la implementación se decidió (ver conversación de diseño, sección 8.2) que el mentor debe **adaptar el ángulo de su explicación al rol del estudiante** (Backend, Frontend, DevOps, Data, etc.), no hablar siempre desde una óptica backend — por lo que el personaje se renombró a "Mentor CodeDraft" (uno solo, sin variar por rol) y no se construyó un avatar gráfico: la identidad visual es textual + un ícono y una paleta de color (morado) reservados exclusivamente para contenido de IA en la interfaz.
+
 | ID | Tarea | Capa | Prioridad | Dependencias | Criterios de aceptación |
 |----|-------|------|-----------|---------------|---------------------------|
-| TT-034 | Definir la identidad visual del personaje "Mentor Backend" (nombre y avatar) | FE | Baja | — | Recurso gráfico y nombre disponibles como assets del proyecto. |
-| TT-035 | Aplicar la identidad del personaje en los mensajes del coach | FE | Baja | TT-033, TT-034 | Todos los mensajes muestran el mismo nombre/avatar; si el recurso gráfico falla, el mensaje se muestra igual en texto. |
+| ~~TT-034~~ | ~~Definir la identidad visual del personaje "Mentor Backend" (nombre y avatar)~~ | FE | Baja | — | **Reemplazada por TT-049.** No se construyó un avatar gráfico; el personaje final se llama "Mentor CodeDraft" y adapta su enfoque al rol del estudiante en vez de hablar siempre como especialista backend. |
+| ~~TT-035~~ | ~~Aplicar la identidad del personaje en los mensajes del coach~~ | FE | Baja | TT-033, TT-034 | **Reemplazada por TT-049.** |
+| TT-049 | Aplicar una identidad visual consistente al feedback de IA en el modal de progreso (ícono + acento de color reservado para IA) | FE | Baja | TT-048 | ✅ El bloque `.mentor-feedback` usa el ícono `sparkles` y el acento `--purple` de la paleta existente (distinto de los colores de gamificación y del teal primario), para que el estudiante identifique visualmente que ese contenido lo generó el mentor de IA. |
 
 ---
 
@@ -292,9 +319,10 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 
 ## 4. Resumen
 
-- **Total de tareas técnicas:** 44 (TT-001 a TT-044), a nivel de funcionalidad (endpoint o componente de interfaz completo). TT-019 y TT-037 quedaron reemplazadas por HU-016.
-- **Orden de construcción:** HU-001 → HU-004 → HU-005 → HU-010 → HU-006 → HU-007 → HU-008 → HU-009 → HU-011 → HU-002/HU-003 → HU-012 → HU-013 → HU-014 → HU-015 → HU-016.
+- **Total de tareas técnicas:** 49 (TT-001 a TT-049), a nivel de funcionalidad (endpoint o componente de interfaz completo). TT-019, TT-037, TT-031, TT-032, TT-033, TT-034 y TT-035 quedaron reemplazadas (ver HU-016 y HU-013/HU-014 actualizadas).
+- **Orden de construcción:** HU-001 → HU-004 → HU-005 → HU-010 → HU-006 → HU-007 → HU-008 → HU-009 → HU-011 → HU-002/HU-003 → HU-015 → HU-016 → HU-013 (parcial) → HU-014 (parcial) → HU-012 (pendiente).
 - **Sin base de datos:** toda la persistencia se resuelve leyendo/escribiendo `profile.json`, `courses.json`, `catalog.json` y `study_sessions.json` con Jackson desde el backend de Spring Boot.
+- **Servicio de IA:** vive en un proyecto Python separado (`ai-service/`, Flask + SDK de Groq), no dentro de este repo de Spring Boot. Ver sección 8.
 
 
 ---
@@ -302,7 +330,9 @@ Sin base de datos: cada recurso se lee/escribe con Jackson desde un archivo JSON
 HU-001 → HU-004 → HU-005 → HU-010 → HU-006 -> HU-007 Actualizar la fecha objetivo de un curso , HU-008 Actualizar el progreso de un curso , H09 Eliminar un curso 
 Hu-011 , HU-002 Recomendaciones personalizadas + HU-003 Cursos sugeridos ,  HU-015 , HU-016 Registrar sesión de estudio y ganar experiencia según el tiempo dedicado
 
-Las demas historias de usuario faltan es para la IA 
+HU-013 Recibir feedback del coach (implementada con otro diseño al planteado originalmente, ver sección 8) y HU-014 Interactuar con el personaje del coach (implementada sin avatar gráfico) ya están completas.
+
+**Pendiente de IA:** HU-012 Generar perfil de aprendizaje (`/learning-profile`) — analizada (costo/beneficio) pero no implementada todavía, ver sección 8.4.
 
 
 ----
@@ -344,3 +374,76 @@ Implementado en el paquete `com.proyecto.codedraft.progress_student` (`controlle
 7. Se guarda la sesión completa en `study_sessions.json`.
 
 **Camino elegido para evitar el doble conteo (A):** `CourseService.updateProgress()` ya **no** depende de `ProfileService` ni otorga experiencia — quedó como una corrección manual de progreso (p. ej. arrastrar un slider), sin recompensa. La experiencia solo se otorga desde `POST /api/study-sessions`.
+
+
+----
+## 8 Lógica de IA — Mentor CodeDraft (implementado)
+
+Ver el diseño original en [CodeDraft_Logica_IA_MVP.md](./CodeDraft_Logica_IA_MVP.md). Esta sección documenta lo que realmente se construyó, incluyendo los puntos donde la implementación se apartó de ese diseño inicial.
+
+### 8.1 Servicio de IA (`ai-service/`)
+
+Proyecto Python + Flask **separado** de este repo (no es un módulo de Spring Boot). Usa el SDK de **Groq** (no Claude/OpenAI) contra un modelo configurado por variable de entorno (`GROP_MODEL` en `.env`, junto a `GROP_API_KEY`). Expone:
+
+- `GET /health` — chequeo de disponibilidad.
+- `POST /coach-message` — único endpoint de negocio implementado (ver 8.2).
+- `POST /learning-profile` — **no implementado** (ver 8.4).
+
+### 8.2 Decisión de integración: síncrono y embebido, no un endpoint aparte
+
+El diseño original sugería que el frontend pidiera el mensaje del coach por separado. Se decidió en su lugar que `StudySessionService.registerSession()` (Spring Boot) llame él mismo a Flask **de forma síncrona**, como parte del mismo request de `POST /api/study-sessions`:
+
+```text
+Frontend --POST /api/study-sessions--> StudySessionController
+                                            |
+                                            v
+                                 StudySessionService.registerSession()
+                                            |
+                    guarda sesión, actualiza progreso del curso, suma XP
+                                            |
+                                            v
+                              CoachAiClient.requestCoachMessage(...)
+                                            |
+                                            v
+                          POST http://localhost:5000/coach-message  (Flask)
+                                            |
+                                            v
+                                        Groq (LLM)
+                                            |
+                                            v
+                     Flask responde {valid, message, whyItMatters, realWorldUse, challenge}
+                                            |
+                                            v
+              se guarda en StudySession y se devuelve dentro de StudySessionResponse
+```
+
+Por eso **no existe** un endpoint público en Spring Boot para pedir el coach-message por separado — `IA_Message/controller/IA_Controller.java` quedó vacío/sin uso.
+
+### 8.3 Manejo de fallos (fail-open)
+
+`CoachAiClient` (paquete `IA_Message.service`) usa `RestClient` con timeouts configurables (`app.ai-service.connect-timeout-ms` / `read-timeout-ms` en `application.properties`, default 2s/8s) y **nunca propaga una excepción**: cualquier fallo (timeout, conexión rechazada, error HTTP, JSON inesperado) se captura, se loguea como warning, y devuelve `Optional.empty()`. Si eso ocurre, `StudySession` guarda `null` en los 6 campos `mentor*` y la sesión se registra exactamente igual — el estudiante nunca ve un error por culpa de la IA.
+
+### 8.4 `/learning-profile` — analizado, no implementado
+
+Se evaluó explícitamente si construirlo ahora: es barato (solo se llamaría una vez, al registrar el perfil, porque hoy no existe un endpoint de actualización de perfil) y reutilizaría el mismo patrón de `CoachAiClient`, pero es decorativo frente al objetivo de validación del MVP (organizar/priorizar/dar seguimiento a cursos) y **hoy no hay espacio en `profile.js`** para mostrar `summary`/`recommendedFocus`. Se decidió posponerlo.
+
+### 8.5 Diseño del prompt: un solo personaje, adaptado por rol
+
+El diseño original de `CodeDraft_Logica_IA_MVP.md` asumía un personaje fijo, "Mentor Backend", que siempre habla desde una óptica de backend. Esto se descartó en la práctica: el perfil del estudiante (`profile.rol`) puede ser cualquiera de los 9 roles del dropdown del frontend (`Codedraft_Fronted/src/data/mockData.js`: Backend Developer, Frontend Developer, Fullstack Developer, DevOps, Cloud Engineer, Software Architect, Security Engineer, Data Engineer, Mobile Developer), y un Frontend Developer no debería recibir siempre consejos de APIs REST.
+
+Se implementó, en cambio, **un solo personaje ("Mentor CodeDraft") que actúa como experto en la disciplina de `rol`**, no una IA con múltiples personajes (eso sigue explícitamente fuera de alcance del MVP según la sección 14 del documento original). El `SYSTEM_PROMPT` en `ai-service/app.py` incluye una guía de enfoque por rol y dos reglas clave:
+
+1. Interpretar conceptos genéricos/transversales (ej. "endpoint") desde la disciplina de `rol`, no de forma neutral.
+2. **Regla de puente entre disciplinas:** cuando `rol` y `curso` pertenecen a disciplinas distintas (ej. un Backend Developer estudiando un curso de Angular), no forzar el concepto dentro de la disciplina de `rol` — explicarlo correctamente en la disciplina real del curso, y usar `rol` solo para conectar ese conocimiento con lo que el estudiante ya domina, sin distorsionar el concepto.
+
+### 8.6 Validación semántica de `notes`
+
+Implementada tal como describe `CodeDraft_Logica_IA_MVP.md` sección 6: notas vacías, sin sentido o no relacionadas con aprendizaje (`"asdfgh"`, `"Hoy fui al gimnasio"`) devuelven `valid:false` con un mensaje pidiendo describir mejor lo aprendido, sin generar `whyItMatters`/`realWorldUse`/`challenge`. Notas válidas pero muy generales (`"Aprendí Spring"`) se aceptan como `valid:true`, invitando a profundizar — no se exige una descripción muy técnica.
+
+### 8.7 Contrato real de `/coach-message` (Spring Boot)
+
+DTOs en `IA_Message/dto/`: `CoachMessageRequest` (con `CoachUserContext`, `CoachCourseContext`, `CoachStudySessionContext`) y `CoachMessageResponse`. La duración real en minutos no existe en el dominio (el frontend solo envía un código `-1/1/2`), así que `StudySessionService` aproxima `durationMinutes` (30/60/90) únicamente como contexto informativo para el prompt — Flask nunca usa ese valor para calcular progreso ni XP, eso sigue siendo responsabilidad exclusiva de Spring Boot (sección 7).
+
+### 8.8 Frontend
+
+`Codedraft_Fronted/src/views/courseModals.js`: al registrar una sesión desde el modal "Registrar progreso", si la respuesta trae `mentorCharacter`, el formulario se reemplaza por el feedback del mentor (mensaje + "por qué importa" + "aplicación real" + "reto práctico", o solo el mensaje si `mentorValid=false`) en vez de cerrar el modal de inmediato. Estilos nuevos en `views.css` (`.mentor-feedback`) usan el acento `--purple` de la paleta existente para diferenciar visualmente el contenido generado por IA.
