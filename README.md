@@ -1,4 +1,4 @@
-# 🎓 CodeDraft (CodeCraftHub)
+# 🎓 DevTrack
 
 **Asistente personal para que desarrolladores autodidactas organicen, prioricen y den seguimiento a su aprendizaje.**
 
@@ -13,7 +13,6 @@
 
 📘 Proyecto académico desarrollado como MVP para validar, con usuarios reales, si una herramienta de este tipo aporta valor antes de invertir en funcionalidades más avanzadas.
 
-👨‍💻 Diseño y desarrollo end-to-end (backend, frontend, servicio de IA y arquitectura general) por **[Alexander Aguilar](https://github.com/AlexanderAguilar1000)**.
 
 🚧 Proyecto sin desplegar en producción; usa datos de prueba con fines demostrativos y educativos.
 
