@@ -1,6 +1,7 @@
-# 🎓 DevTrack
+# 🎓 DevTrack 
 
-**Asistente personal para que desarrolladores autodidactas organicen, prioricen y den seguimiento a su aprendizaje.**
+
+**Aplicación web que ayuda a desarrolladores autodidactas a decidir qué cursos estudiar, priorizar sus aprendizajes según su perfil  y recibir feedback personalizado mediante IA después de cada sesión de estudio.**
 
 ![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3-6DB33F?logo=springboot&logoColor=white)
@@ -9,12 +10,9 @@
 ![Groq](https://img.shields.io/badge/Groq-LLM-F55036)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white)
-![Architecture](https://img.shields.io/badge/Architecture-Microservices-blue)
-
-📘 Proyecto académico desarrollado como MVP para validar, con usuarios reales, si una herramienta de este tipo aporta valor antes de invertir en funcionalidades más avanzadas.
 
 
-🚧 Proyecto sin desplegar en producción; usa datos de prueba con fines demostrativos y educativos.
+📘 Proyecto académico desarrollado como MVP para validar la propuesta con usuarios reales antes de incorporar funcionalidades más avanzadas. 
 
 ---
 
@@ -36,23 +34,25 @@
 
 ## 📝 Resumen
 
-**CodeDraft** es un sistema de tres servicios (backend en Spring Boot, frontend en JavaScript/Vite y un microservicio de IA en Flask con Groq) que centraliza los cursos que un desarrollador quiere estudiar, calcula automáticamente cuál debería tomar a continuación y acompaña el proceso con feedback generado por IA sobre lo que realmente aprendió, no solo con un contador de progreso.
+**DevTrack** nace para resolver una situación frecuente entre los desarrolladores autodidactas: tener acceso a una gran cantidad de de contenido educativo, pero no saber qué estudiar, en qué orden ni cómo comprobar que realmente están aprendiendo.
 
-A diferencia de Coursera o Udemy, **no aloja contenido educativo**: es una capa de organización y coaching sobre los cursos que el usuario ya está tomando en cualquier plataforma.
+DevTrack cuenta con su propio catálogo de cursos y, a partir del perfil, conocimientos e intereses del usuario, utiliza un algoritmo de puntuación para recomendar los cursos más relevantes. Además, permite establecer prioridades y fechas objetivo para determinar qué curso debería continuar el usuario
+
+El aprendizaje no termina al completar una lección. Después de cada sesión, el usuario registra lo que aprendió y Mentor DevTrack, un mentor basado en IA, analiza esa información, proporciona retroalimentación y propone un ejercicio práctico para aplicar el conocimiento adquirido.
+
+A diferencia de plataformas como Udemy o Coursera, DevTrack no busca alojar contenido educativo. Funciona como una capa de organización, seguimiento y refuerzo del aprendizaje sobre los cursos que el usuario realiza en distintas plataformas.
 
 ---
 
 ## 🚨 Problemática
+1. Consumo pasivo: veo videos, pero no aplico nada
+La mayoría de estudiantes autodidactas terminan un curso sin haber puesto en práctica lo aprendido. CodeDraft resuelve esto con el Mentor CodeDraft: al registrar una sesión de estudio, el sistema valida semánticamente lo que escribiste (rechaza notas vacías o sin relación con aprendizaje) y, si es válido, te devuelve la importancia real del tema, su conexión con otros conceptos y un ejercicio concreto para aplicarlo.
 
-Los desarrolladores autodidactas acumulan cursos de distintas plataformas (Udemy, Coursera, YouTube, etc.) sin una forma clara de organizarlos. Con el tiempo se vuelve difícil responder preguntas básicas:
+2. No sé qué curso matricularme
+Plataformas como Udemy o Coursera ofrecen miles de cursos, y elegir por dónde empezar genera parálisis por análisis. CodeDraft usa un algoritmo de puntuación basado en el perfil del usuario (rol +3, carrera +1, cada interés +2) para sugerir automáticamente los cursos del catálogo más relevantes para esa persona.
 
-- ¿Qué curso debería continuar?
-- ¿Cuál tiene mayor prioridad?
-- ¿Cuánto he avanzado realmente?
-- ¿Qué cursos siguen pendientes?
-- ¿Cuál debería terminar primero?
-
-Esta dispersión genera pérdida de tiempo al decidir qué estudiar, abandono de cursos a medias y ausencia de una guía que oriente el aprendizaje continuo.
+3. Empiezo cursos y no los termino
+Sin fecha límite ni prioridad clara, los cursos se acumulan sin avance. CodeDraft permite registrar prioridad, fecha objetivo y progreso de cada curso, y recomienda automáticamente cuál estudiar a continuación según esos criterios.
 
 ---
 
