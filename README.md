@@ -72,9 +72,6 @@ Sin fecha límite ni prioridad clara, los cursos se acumulan sin avance. CodeDra
 ## 💡 Propuesta de valor
 
 > CodeDraft ayuda a desarrolladores autodidactas a registrar, priorizar y dar seguimiento a sus cursos para decidir fácilmente qué estudiar primero y mantener constancia en su aprendizaje.
-
-El diferenciador frente a un simple to-do list es el **componente de IA con criterio de dominio**: el mentor no da mensajes motivacionales genéricos, valida semánticamente lo que el estudiante escribió y adapta su explicación a la disciplina del rol (un Backend Developer y un Frontend Developer estudiando el mismo curso reciben ángulos distintos).
-
 ---
 
 ## 🧠 Decisiones técnicas destacadas
@@ -129,7 +126,6 @@ Frontend (Vite/JS) ──HTTP──▶ Backend (Spring Boot) ──HTTP síncron
 **Servicio de IA**
 - Python · Flask
 - Groq SDK (inferencia LLM)
-- Pydantic
 
 ---
 
@@ -208,4 +204,3 @@ npm run dev
 
 El MVP cubre de forma completa el flujo principal: perfil de usuario, gestión de cursos, recomendaciones personalizadas, priorización inteligente, sesiones de estudio con experiencia y feedback del mentor de IA.
 
-Queda pendiente (evaluado pero no implementado por ahora): generación de un "perfil de aprendizaje" narrativo vía IA (`/learning-profile`), pospuesto por bajo impacto frente al objetivo de validación del MVP.
