@@ -44,17 +44,17 @@ A diferencia de plataformas como Udemy o Coursera, DevTrack no busca alojar cont
 
 ### 🖥️ Vista del sistema
 <p align="center">
-  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\Dashboard.png" width="65%">
-  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\CursosSugeridosLista.png" width="65%">
+  <img src="codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\Dashboard.png" width="85%">
+  <img src="codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\CursosSugeridosLista.png" width="85%">
 </p>
 
 <p align="center">
-  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\ListaCursos.png" width="65%">
-  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\RegistrarProgreso.png" width="65%">
+  <img src="codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\ListaCursos.png" width="85%">
+  <img src="codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\RegistrarProgreso.png" width="85%">
 </p>
 
 <p align="center">
-   <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\MentorIA.png" width="65%">
+   <img src="codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\MentorIA.png" width="85%">
 </p>
 
 
