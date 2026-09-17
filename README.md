@@ -42,7 +42,21 @@ El aprendizaje no termina al completar una lección. Después de cada sesión, e
 
 A diferencia de plataformas como Udemy o Coursera, DevTrack no busca alojar contenido educativo. Funciona como una capa de organización, seguimiento y refuerzo del aprendizaje sobre los cursos que el usuario realiza en distintas plataformas.
 
----
+### 🖥️ Vista del sistema
+<p align="center">
+  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\Dashboard.png" width="65%">
+  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\CursosSugeridosLista.png" width="65%">
+</p>
+
+<p align="center">
+  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\ListaCursos.png" width="65%">
+  <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\RegistrarProgreso.png" width="65%">
+</p>
+
+<p align="center">
+   <img src="Codedraft\src\main\java\com\proyecto\codedraft\docs\imagenes\MentorIA.png" width="65%">
+</p>
+
 
 ## 🚨 Problemática
 1. Consumo pasivo: veo videos, pero no aplico nada

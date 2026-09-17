@@ -103,4 +103,19 @@
   "mentorWhyItMatters" : "En el backend, la arquitectura hexagonal permite aislar la lógica de negocio de detalles de infraestructura como bases de datos o APIs, facilitando pruebas unitarias, mantenibilidad y la posibilidad de cambiar de tecnología sin afectar el núcleo.",
   "mentorRealWorldUse" : "En un proyecto Spring Boot podrías estructurar tu aplicación con puertos y adaptadores, creando un puerto para el repositorio y dos adaptadores: uno que use JPA y otro que use una base de datos NoSQL, y cambiar entre ellos mediante configuración.",
   "mentorChallenge" : "Crea un pequeño microservicio CRUD en Spring Boot usando arquitectura hexagonal: define un puerto de repositorio, implementa dos adaptadores (uno con H2 en memoria y otro con PostgreSQL) y escribe pruebas unitarias que usen solo el núcleo."
+}, {
+  "id" : "046f6368-1002-42a5-8968-daef87b7f6db",
+  "courseId" : "e2fd502b-950a-4b6c-84e5-71257e826ed1",
+  "date" : "2026-09-16",
+  "duration" : -1,
+  "notes" : "La arquitectura hexagonal permite cambiar la base de datos sin afectar directamente la lógica de negocio, gracias a la separación mediante puertos y adaptadores.",
+  "progressAdded" : 5,
+  "experiencePoints" : 45,
+  "createdAt" : "2026-09-16T17:52:21.4355184",
+  "mentorCharacter" : "Mentor CodeDraft",
+  "mentorValid" : true,
+  "mentorMessage" : "¡Excelente! Captaste la esencia de la arquitectura hexagonal y su beneficio para la separación de preocupaciones.",
+  "mentorWhyItMatters" : "En el backend, una arquitectura basada en puertos y adaptadores permite que la lógica de negocio sea independiente de frameworks y bases de datos, facilitando pruebas unitarias, mantenimiento y evolución del sistema.",
+  "mentorRealWorldUse" : "En un proyecto Spring Boot, puedes definir interfaces de repositorio como puertos y crear adaptadores para MySQL, PostgreSQL o una base NoSQL sin tocar la capa de dominio, lo que permite cambiar de DB con mínima fricción.",
+  "mentorChallenge" : "Refactoriza un servicio CRUD existente en tu proyecto a una arquitectura hexagonal: crea un puerto para el repositorio, implementa dos adaptadores (uno para una base relacional y otro para un almacenamiento en memoria) y escribe pruebas unitarias que usen solo el puerto."
 } ]
