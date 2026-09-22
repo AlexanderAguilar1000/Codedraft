@@ -9,8 +9,8 @@ from flask import Flask, jsonify, request
 load_dotenv()  #Busca el archivo .env y carga sus variables en las variables de entorno del proceso .
 
 #Obtengo las variables de entorno del archivo ".env"
-api_key = os.getenv("GROP_API_KEY")
-model = os.getenv("GROP_MODEL")
+api_key = os.getenv("GROQ_API_KEY")
+model = os.getenv("GROQ_MODEL")
 
 #Restricciones , si no encuentra las variables de entorno
 if not api_key:
